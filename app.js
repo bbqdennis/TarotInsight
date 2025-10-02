@@ -6,10 +6,26 @@ const state = {
   spreadDraws: [],
   deckBlueprint: [],
   remainingDeck: [],
-  timestamp: null
+  timestamp: null,
+  remoteInterpretations: null
 };
 
 const ui = {};
+
+const TAROT_API_ENDPOINT = 'https://n8nautorobot.duckdns.org/webhook/tarot_master';
+const TAROT_API_TIMEOUT = 60000;
+
+function escapeHtml(value) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 const categoryKeywords = {
   love: ['愛情', '感情', '戀人', '伴侶', '婚姻', '關係', '曖昧', '分手', '復合', '感受', '桃花'],
@@ -719,8 +735,8 @@ function attachEventListeners() {
   ui.drawAuto.addEventListener('click', handleAutoDraw);
   ui.resetDraw.addEventListener('click', resetSpreadDraw);
   ui.toReading.addEventListener('click', () => {
-    prepareReading();
     switchPanel('reading-section');
+    prepareReading();
   });
   ui.toReport.addEventListener('click', () => {
     prepareReport();
@@ -925,6 +941,7 @@ function resetSpreadDraw() {
   resetDeck();
   const count = state.selectedSpread.cardCount;
   state.spreadDraws = Array.from({ length: count }, () => null);
+  state.remoteInterpretations = null;
   ui.drawManual.disabled = false;
   ui.drawAuto.disabled = false;
   ui.toReading.disabled = true;
@@ -1005,47 +1022,117 @@ function checkDrawCompletion() {
   }
 }
 
-function prepareReading() {
+async function prepareReading() {
+  if (!state.selectedSpread) return;
+
+  if (!state.timestamp) {
+    state.timestamp = new Date();
+  }
+
+  renderReadingSummary();
+  ui.cardInterpretations.innerHTML = '<div class="card-interpretation__loading">正在生成解牌內容...</div>';
+  state.remoteInterpretations = null;
+
+  const questionPayload = buildQuestionPayload();
+  if (!questionPayload) {
+    renderCardInterpretations();
+    return;
+  }
+
+  try {
+    const remoteResults = await fetchTarotInterpretations(questionPayload);
+    if (Array.isArray(remoteResults) && remoteResults.length) {
+      state.remoteInterpretations = remoteResults;
+      renderCardInterpretations(remoteResults, { autoExpand: true });
+    } else {
+      state.remoteInterpretations = null;
+      renderCardInterpretations(null, {
+        message: '暫無線上解牌結果，以下為基本解析。'
+      });
+    }
+  } catch (error) {
+    console.error('Failed to fetch tarot insights:', error);
+    state.remoteInterpretations = null;
+    renderCardInterpretations(null, {
+      message: '目前無法連線取得線上解析，以下為基礎解讀。'
+    });
+  }
+}
+
+function renderReadingSummary() {
   if (!state.selectedSpread) return;
 
   const summaryItems = state.selectedSpread.positions.map((pos, index) => {
     const card = state.spreadDraws[index];
-    return `<div class="chip">${pos.title}：${card ? card.name : '尚未抽牌'}</div>`;
+    const cardLabel = card ? card.name : '尚未抽牌';
+    return `<div class="chip">${escapeHtml(pos.title)}：${escapeHtml(cardLabel)}</div>`;
   });
+
+  const questionLine = state.question ? `<p>提問：「${escapeHtml(state.question)}」</p>` : '';
 
   ui.readingOverview.innerHTML = `
     <div class="reading-overview__meta">
-      <h3>${state.selectedSpread.name}</h3>
-      <p>共 ${state.selectedSpread.cardCount} 張牌 · 問題主題：${getCategoryDisplay()}</p>
-      ${state.question ? `<p>提問：「${state.question}」</p>` : ''}
+      <h3>${escapeHtml(state.selectedSpread.name)}</h3>
+      <p>共 ${state.selectedSpread.cardCount} 張牌 · 問題主題：${escapeHtml(getCategoryDisplay())}</p>
+      ${questionLine}
     </div>
     <div class="reading-overview__chips">${summaryItems.join('')}</div>
   `;
+}
+
+function renderCardInterpretations(remoteResults, options = {}) {
+  if (!state.selectedSpread) return;
+
+  const effectiveRemote =
+    remoteResults === undefined ? state.remoteInterpretations : remoteResults;
+  const remoteMap = buildRemoteInterpretationMap(effectiveRemote);
+
+  const autoExpandDetails = Boolean(options.autoExpand);
 
   const cardsHtml = state.selectedSpread.positions
     .map((pos, index) => {
       const card = state.spreadDraws[index];
       if (!card) return '';
-      const detailText = buildDetailText(pos, card);
-      const keywords = card.keywords.map((keyword) => `<span>${keyword}</span>`).join('');
+
+      const remote = remoteMap.get(pos.title) || remoteMap.get(pos.label);
+      const baseDetail = buildDetailText(pos, card);
+      const summaryText = remote?.interpretation ? escapeHtml(remote.interpretation) : escapeHtml(card.meaning);
+      const detailParts = [];
+      if (remote?.advice) {
+        detailParts.push(escapeHtml(remote.advice));
+      }
+      if (remote) {
+        if (!detailParts.length && remote.interpretation) {
+          detailParts.push(escapeHtml(remote.interpretation));
+        }
+      } else {
+        detailParts.push(escapeHtml(baseDetail));
+      }
+      const detailText = detailParts.join('<br><br>');
+      const cardDisplay = remote?.card ? escapeHtml(remote.card) : `${escapeHtml(card.name)} · ${escapeHtml(card.orientationLabel)}`;
+      const keywords = card.keywords.map((keyword) => `<span>${escapeHtml(keyword)}</span>`).join('');
       const interpretationId = `interpretation-${pos.id}`;
+      const detailsClass = autoExpandDetails ? 'active' : '';
+      const buttonLabel = autoExpandDetails ? '收合詳解' : '查看更多';
 
       return `
         <article class="card-interpretation" id="${interpretationId}">
           <div class="card-interpretation__header">
-            <h4 class="card-interpretation__title">${pos.label} · ${pos.title}</h4>
-            <span class="chip">${card.name} · ${card.orientationLabel}</span>
+            <h4 class="card-interpretation__title">${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</h4>
+            <span class="chip">${cardDisplay}</span>
           </div>
-          <p class="card-interpretation__summary">${card.meaning}</p>
-          <p class="card-interpretation__details">${detailText}</p>
+          <p class="card-interpretation__summary">${summaryText}</p>
+          <p class="card-interpretation__details ${detailsClass}">${detailText}</p>
           <div class="keywords">${keywords}</div>
-          <button class="btn ghost" data-toggle="details">查看更多</button>
+          <button class="btn ghost" data-toggle="details">${buttonLabel}</button>
         </article>
       `;
     })
     .join('');
 
-  ui.cardInterpretations.innerHTML = cardsHtml;
+  const messageHtml = options.message ? `<div class="card-interpretation__notice">${escapeHtml(options.message)}</div>` : '';
+  ui.cardInterpretations.innerHTML = `${messageHtml}${cardsHtml}`;
+
   ui.cardInterpretations.querySelectorAll('[data-toggle="details"]').forEach((button) => {
     button.addEventListener('click', () => {
       const details = button.parentElement.querySelector('.card-interpretation__details');
@@ -1060,6 +1147,69 @@ function prepareReading() {
   });
 }
 
+function buildQuestionPayload() {
+  if (!state.selectedSpread) return '';
+
+  const lines = [];
+  lines.push(state.selectedSpread.name);
+  lines.push(`共 ${state.selectedSpread.cardCount} 張牌 · 問題主題：${getCategoryDisplay()}`);
+  if (state.question) {
+    lines.push(`提問：「${state.question}」`);
+  }
+
+  state.selectedSpread.positions.forEach((pos, index) => {
+    const card = state.spreadDraws[index];
+    if (!card) return;
+    lines.push(`${pos.title}：${card.name} · ${card.orientationLabel}`);
+  });
+
+  return lines.join('\n');
+}
+
+async function fetchTarotInterpretations(questionPayload) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TAROT_API_TIMEOUT);
+
+  try {
+    const response = await fetch(TAROT_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'n8n-key': 'connect-to-n8n'
+      },
+      body: JSON.stringify({ question: questionPayload }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error(`Tarot API responded with status ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Tarot API request timed out');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function buildRemoteInterpretationMap(remoteResults) {
+  const map = new Map();
+  if (!Array.isArray(remoteResults)) {
+    return map;
+  }
+  remoteResults.forEach((item) => {
+    if (item && item.position) {
+      map.set(item.position, item);
+    }
+  });
+  return map;
+}
+
 function buildDetailText(position, card) {
   const base = `${position.title}代表${position.meaning}`;
   const detail = card.detail;
@@ -1072,11 +1222,13 @@ function buildDetailText(position, card) {
 function prepareReport() {
   if (!state.selectedSpread) return;
 
+  const remoteMap = buildRemoteInterpretationMap(state.remoteInterpretations);
+
   const headerHtml = `
     <div class="report-summary__header">
-      <h3>${state.selectedSpread.name}</h3>
-      ${state.question ? `<p>提問：${state.question}</p>` : ''}
-      <p class="report-summary__meta">時間：${formatTimestamp(state.timestamp)} · 主題：${getCategoryDisplay()}</p>
+      <h3>${escapeHtml(state.selectedSpread.name)}</h3>
+      ${state.question ? `<p>提問：${escapeHtml(state.question)}</p>` : ''}
+      <p class="report-summary__meta">時間：${escapeHtml(formatTimestamp(state.timestamp))} · 主題：${escapeHtml(getCategoryDisplay())}</p>
     </div>
   `;
 
@@ -1084,12 +1236,23 @@ function prepareReport() {
     .map((pos, index) => {
       const card = state.spreadDraws[index];
       if (!card) return '';
+      const remote = remoteMap.get(pos.title) || remoteMap.get(pos.label);
+      const cardDisplay = remote?.card
+        ? escapeHtml(remote.card)
+        : `${escapeHtml(card.name)}（${escapeHtml(card.orientationLabel)}）`;
+      const summaryText = remote?.interpretation
+        ? escapeHtml(remote.interpretation)
+        : escapeHtml(card.meaning);
+      const adviceText = remote?.advice ? escapeHtml(remote.advice) : escapeHtml(card.insight);
+      const adviceHtml = adviceText
+        ? `<span class="report-summary__meta">${adviceText}</span>`
+        : '';
       return `
         <div class="report-summary__item">
-          <strong>${pos.label} · ${pos.title}</strong>
-          <span>${card.name}（${card.orientationLabel}）</span>
-          <span>${card.meaning}</span>
-          <span class="report-summary__meta">${card.insight}</span>
+          <strong>${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</strong>
+          <span>${cardDisplay}</span>
+          <span>${summaryText}</span>
+          ${adviceHtml}
         </div>
       `;
     })
@@ -1136,6 +1299,7 @@ function resetAll() {
   state.selectedSpread = null;
   state.spreadDraws = [];
   state.timestamp = null;
+  state.remoteInterpretations = null;
   resetDeck();
   ui.questionTextarea.value = '';
   ui.analysisResult.textContent = '';
