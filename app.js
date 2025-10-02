@@ -716,6 +716,7 @@ function cacheElements() {
   ui.toReport = document.getElementById('to-report');
   ui.reportSummary = document.getElementById('report-summary');
   ui.downloadReport = document.getElementById('download-report');
+  ui.copyReport = document.getElementById('copy-report');
   ui.shareLine = document.getElementById('share-line');
   ui.shareEmail = document.getElementById('share-email');
   ui.currentYear = document.getElementById('current-year');
@@ -745,6 +746,9 @@ function attachEventListeners() {
   ui.downloadReport.addEventListener('click', () => {
     window.print();
   });
+  if (ui.copyReport) {
+    ui.copyReport.addEventListener('click', handleCopyReport);
+  }
   ui.shareLine.addEventListener('click', handleShareLine);
   ui.shareEmail.addEventListener('click', handleShareEmail);
 
@@ -1271,6 +1275,109 @@ function handleShareEmail() {
   const subject = encodeURIComponent('Tarot Insight 解牌師｜我的解牌報告');
   const body = encodeURIComponent(buildShareText());
   window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+async function handleCopyReport() {
+  if (!state.selectedSpread || !ui.copyReport) return;
+
+  const text = buildReportCopyText();
+  if (!text) {
+    return;
+  }
+
+  const button = ui.copyReport;
+  const originalLabel = button.dataset.originalLabel || button.textContent;
+  button.dataset.originalLabel = originalLabel;
+  button.disabled = true;
+
+  let success = true;
+  try {
+    await copyToClipboard(text);
+  } catch (error) {
+    success = false;
+    console.error('Failed to copy report:', error);
+  }
+
+  button.textContent = success ? '已複製' : '複製失敗';
+
+  setTimeout(() => {
+    button.textContent = button.dataset.originalLabel;
+    button.disabled = false;
+  }, 2000);
+}
+
+function buildReportCopyText() {
+  if (!state.selectedSpread) return '';
+
+  const remoteMap = buildRemoteInterpretationMap(state.remoteInterpretations);
+  const lines = [];
+
+  lines.push('Tarot Insight 解牌師 - 解牌報告');
+  lines.push(`牌陣：${state.selectedSpread.name}`);
+  const categories = getCategoryDisplay();
+  if (categories) {
+    lines.push(`主題：${categories}`);
+  }
+  const when = formatTimestamp(state.timestamp);
+  if (when) {
+    lines.push(`時間：${when}`);
+  }
+  if (state.question) {
+    lines.push(`提問：「${state.question}」`);
+  }
+  lines.push('');
+
+  state.selectedSpread.positions.forEach((pos, index) => {
+    const card = state.spreadDraws[index];
+    if (!card) return;
+    const remote = remoteMap.get(pos.title) || remoteMap.get(pos.label);
+    const cardDisplay = remote?.card || `${card.name}（${card.orientationLabel}）`;
+    const summaryText = remote?.interpretation || card.meaning;
+    const adviceText = remote?.advice || card.insight;
+
+    lines.push(`${pos.label} · ${pos.title}`);
+    lines.push(`卡牌：${cardDisplay}`);
+    if (summaryText) {
+      lines.push(`重點：${summaryText}`);
+    }
+    if (adviceText) {
+      lines.push(`建議：${adviceText}`);
+    }
+    lines.push('');
+  });
+
+  return lines.join('\n').trim();
+}
+
+async function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  return new Promise((resolve, reject) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if (successful) {
+        resolve();
+      } else {
+        reject(new Error('document.execCommand returned false'));
+      }
+    } catch (error) {
+      document.body.removeChild(textarea);
+      reject(error);
+    }
+  });
 }
 
 function buildShareText() {
