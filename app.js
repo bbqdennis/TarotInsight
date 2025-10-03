@@ -7,13 +7,73 @@ const state = {
   deckBlueprint: [],
   remainingDeck: [],
   timestamp: null,
-  remoteInterpretations: null
+  remoteInterpretations: null,
+  simpleMode: true,
+  interpretationNotice: '',
+  interpretationAutoExpand: false
 };
 
 const ui = {};
 
 const TAROT_API_ENDPOINT = 'https://n8nautorobot.duckdns.org/webhook/tarot_master';
 const TAROT_API_TIMEOUT = 60000;
+const CARD_IMAGE_BASE_PATH = 'Image/LegacyTarot';
+
+const legacyMajorImageMap = {
+  'major-0': '0LMfool-2x.jpg',
+  'major-1': '1LMmagician-2x.jpg',
+  'major-2': '2LMhighpriestess-2x.jpg',
+  'major-3': '3LMempress-2x.jpg',
+  'major-4': '4LMemperor-2x.jpg',
+  'major-5': '5LMfaith-2x.jpg',
+  'major-6': '6LMlovers-2x.jpg',
+  'major-7': '7LMchariot-2x.jpg',
+  'major-8': '8LMstrength-2x.jpg',
+  'major-9': '9LHermit-2x.jpg',
+  'major-10': '10LMwheel-2x.jpg',
+  'major-11': '11LMjustice-2x.jpg',
+  'major-12': '12LMhanging-man-2x.jpg',
+  'major-13': '13LMdeath-2x.jpg',
+  'major-14': '14LMtemperance-2x.jpg',
+  'major-15': '15LMdevil-2x.jpg',
+  'major-16': '16LMtower-2x.jpg',
+  'major-17': '17LMstar-2x.jpg',
+  'major-18': '18LMmoon-2x.jpg',
+  'major-19': '19LMsun-2x.jpg',
+  'major-20': '20LMjudgement-2x.jpg',
+  'major-21': '21LMworld-2x.jpg'
+};
+
+const suitImagePrefix = {
+  wands: 'Lwands',
+  cups: 'Lcups',
+  swords: 'Lswords',
+  pentacles: 'Lcoins'
+};
+
+const minorRankImageSuffix = {
+  ace: '1Ace',
+  '2': '2',
+  '3': '3',
+  '4': '4',
+  '5': '5',
+  '6': '6',
+  '7': '7',
+  '8': '8',
+  '9': '9',
+  '10': '10',
+  page: 'Page',
+  knight: 'KNIGHT',
+  queen: 'Queen',
+  king: 'KING'
+};
+
+const minorSuitSuffixOverrides = {
+  pentacles: {
+    page: 'page',
+    king: 'KINGS'
+  }
+};
 
 function escapeHtml(value) {
   if (typeof value !== 'string') {
@@ -689,6 +749,7 @@ function shuffle(list) {
 function initializeApp() {
   cacheElements();
   attachEventListeners();
+  updateSimpleModeToggle();
   state.deckBlueprint = generateDeck();
   resetDeck();
   setCurrentYear();
@@ -703,6 +764,7 @@ function cacheElements() {
   ui.analysisResult = document.getElementById('analysis-result');
   ui.recommendedSpreads = document.getElementById('recommended-spreads');
   ui.panels = Array.from(document.querySelectorAll('.panel'));
+  ui.toggleSimpleMode = document.getElementById('toggle-simple-mode');
   ui.spreadCaption = document.getElementById('selected-spread-caption');
   ui.spreadDetails = document.getElementById('spread-details');
   ui.drawManual = document.getElementById('draw-manual');
@@ -719,10 +781,16 @@ function cacheElements() {
   ui.copyReport = document.getElementById('copy-report');
   ui.shareLine = document.getElementById('share-line');
   ui.shareEmail = document.getElementById('share-email');
+  ui.lightbox = document.getElementById('card-lightbox');
+  ui.lightboxImage = document.getElementById('card-lightbox-image');
+  ui.lightboxCaption = document.getElementById('card-lightbox-caption');
   ui.currentYear = document.getElementById('current-year');
 }
 
 function attachEventListeners() {
+  if (ui.toggleSimpleMode) {
+    ui.toggleSimpleMode.addEventListener('click', toggleSimpleMode);
+  }
   ui.submitQuestion.addEventListener('click', handleQuestionSubmit);
   ui.skipQuestion.addEventListener('click', () => {
     state.question = '';
@@ -767,6 +835,112 @@ function attachEventListeners() {
       switchPanel('question-section');
     });
   });
+
+  document.addEventListener('click', handleDocumentClick);
+  document.addEventListener('keydown', handleDocumentKeydown);
+}
+
+function toggleSimpleMode() {
+  state.simpleMode = !state.simpleMode;
+  updateSimpleModeToggle();
+  updatePositionStatus();
+  if (state.simpleMode) {
+    closeCardLightbox();
+  }
+
+  if (!state.selectedSpread) {
+    return;
+  }
+
+  const options = {};
+  if (state.interpretationAutoExpand) {
+    options.autoExpand = true;
+  }
+  if (state.interpretationNotice) {
+    options.message = state.interpretationNotice;
+  }
+  renderCardInterpretations(undefined, options);
+}
+
+function updateSimpleModeToggle() {
+  if (!ui.toggleSimpleMode) {
+    return;
+  }
+
+  if (state.simpleMode) {
+    ui.toggleSimpleMode.textContent = '切換至圖像模式';
+    ui.toggleSimpleMode.setAttribute('aria-pressed', 'false');
+  } else {
+    ui.toggleSimpleMode.textContent = '切換至簡化模式';
+    ui.toggleSimpleMode.setAttribute('aria-pressed', 'true');
+  }
+}
+
+function handleDocumentClick(event) {
+  const actionTarget = event.target.closest('[data-lightbox-action]');
+  if (actionTarget) {
+    event.preventDefault();
+    closeCardLightbox();
+    return;
+  }
+
+  const imageTarget = event.target.closest('.js-card-image');
+  if (!imageTarget || state.simpleMode) {
+    return;
+  }
+
+  const src = imageTarget.getAttribute('data-full-src') || imageTarget.getAttribute('src');
+  if (!src) {
+    return;
+  }
+  const label = imageTarget.getAttribute('data-card-label') || imageTarget.getAttribute('alt') || '';
+  const orientation = imageTarget.getAttribute('data-orientation') || 'upright';
+  openCardLightbox(src, label, orientation);
+}
+
+function handleDocumentKeydown(event) {
+  if (event.key === 'Escape') {
+    closeCardLightbox();
+  }
+}
+
+function openCardLightbox(src, label, orientation = 'upright') {
+  if (state.simpleMode) {
+    return;
+  }
+  if (!ui.lightbox || !ui.lightboxImage) {
+    return;
+  }
+
+  ui.lightboxImage.src = src;
+  ui.lightboxImage.alt = label || '';
+  ui.lightboxImage.classList.toggle('is-reversed', orientation === 'reversed');
+
+  if (ui.lightboxCaption) {
+    ui.lightboxCaption.textContent = label || '';
+    ui.lightboxCaption.style.display = label ? 'block' : 'none';
+  }
+
+  ui.lightbox.removeAttribute('hidden');
+  ui.lightbox.classList.add('active');
+  ui.lightbox.setAttribute('aria-hidden', 'false');
+}
+
+function closeCardLightbox() {
+  if (!ui.lightbox || !ui.lightboxImage) {
+    return;
+  }
+
+  ui.lightbox.classList.remove('active');
+  ui.lightbox.setAttribute('aria-hidden', 'true');
+  ui.lightbox.setAttribute('hidden', '');
+  ui.lightboxImage.classList.remove('is-reversed');
+  ui.lightboxImage.removeAttribute('src');
+  ui.lightboxImage.alt = '';
+  if (ui.lightboxCaption) {
+    ui.lightboxCaption.textContent = '';
+    ui.lightboxCaption.style.display = 'none';
+  }
 }
 
 function handleQuestionSubmit() {
@@ -946,6 +1120,8 @@ function resetSpreadDraw() {
   const count = state.selectedSpread.cardCount;
   state.spreadDraws = Array.from({ length: count }, () => null);
   state.remoteInterpretations = null;
+  state.interpretationNotice = '';
+  state.interpretationAutoExpand = false;
   ui.drawManual.disabled = false;
   ui.drawAuto.disabled = false;
   ui.toReading.disabled = true;
@@ -992,24 +1168,93 @@ function drawCard() {
   };
 }
 
+function getCardImagePath(card) {
+  if (!card) {
+    return null;
+  }
+
+  if (card.arcana === 'major') {
+    const filename = legacyMajorImageMap[card.id];
+    return filename ? `${CARD_IMAGE_BASE_PATH}/${filename}` : null;
+  }
+
+  if (card.arcana === 'minor') {
+    const prefix = suitImagePrefix[card.suit];
+    if (!prefix) {
+      return null;
+    }
+
+    const overrides = minorSuitSuffixOverrides[card.suit] || {};
+    const suffix = overrides[card.rank] || minorRankImageSuffix[card.rank];
+    return suffix ? `${CARD_IMAGE_BASE_PATH}/${prefix}-${suffix}-2x.jpg` : null;
+  }
+
+  return null;
+}
+
+function buildCardImageHtml(card) {
+  const imagePath = getCardImagePath(card);
+  if (!imagePath) {
+    return '';
+  }
+
+  const classes = ['card-image', 'js-card-image'];
+  if (card.orientation === 'reversed') {
+    classes.push('is-reversed');
+  }
+
+  const cardLabel = `${card.name} · ${card.orientationLabel}`;
+  const attributes = [
+    `src="${escapeHtml(imagePath)}"`,
+    `data-full-src="${escapeHtml(imagePath)}"`,
+    `alt="${escapeHtml(card.name)}"`,
+    `data-card-label="${escapeHtml(cardLabel)}"`,
+    `data-orientation="${escapeHtml(card.orientation || 'upright')}"`,
+    'loading="lazy"',
+    `class="${classes.join(' ')}"`
+  ];
+
+  return `<img ${attributes.join(' ')} />`;
+}
+
+function buildCardStatusHtml(card, options = {}) {
+  if (!card) {
+    return '<span class="card-status__label">尚未抽牌</span>';
+  }
+
+  const cardLabel = `${escapeHtml(card.name)} · ${escapeHtml(card.orientationLabel)}`;
+  if (state.simpleMode) {
+    return `<span class="card-status__label">${cardLabel}</span>`;
+  }
+
+  const imageHtml = buildCardImageHtml(card);
+  if (!imageHtml) {
+    return `<span class="card-status__label">${cardLabel}</span>`;
+  }
+
+  const alignClass = options.align === 'right' ? ' card-status--right' : '';
+  return `
+    <div class="card-status${alignClass}">
+      ${imageHtml}
+      <span class="card-status__label">${cardLabel}</span>
+    </div>
+  `.trim();
+}
+
 function updatePositionStatus() {
   if (!state.selectedSpread) return;
 
   const items = state.selectedSpread.positions.map((pos, index) => {
     const card = state.spreadDraws[index];
-    const display = card
-      ? `${card.name} · ${card.orientationLabel}`
-      : '尚未抽牌';
-
     const statusElement = document.getElementById(`position-card-${index}`);
     if (statusElement) {
-      statusElement.textContent = display;
+      statusElement.innerHTML = buildCardStatusHtml(card);
     }
 
     return `
       <li>
-        <span>${pos.label} · ${pos.title}</span>
-        <span class="position-status__card">${display}</span>
+        <span>${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</span>
+        <div class="position-status__card">${buildCardStatusHtml(card, { align: 'right' })}</div>
       </li>
     `;
   });
@@ -1033,6 +1278,8 @@ async function prepareReading() {
     state.timestamp = new Date();
   }
 
+  state.interpretationNotice = '';
+  state.interpretationAutoExpand = false;
   renderReadingSummary();
   ui.cardInterpretations.innerHTML = '<div class="card-interpretation__loading">正在生成解牌內容...</div>';
   state.remoteInterpretations = null;
@@ -1092,6 +1339,8 @@ function renderCardInterpretations(remoteResults, options = {}) {
   const remoteMap = buildRemoteInterpretationMap(effectiveRemote);
 
   const autoExpandDetails = Boolean(options.autoExpand);
+  state.interpretationAutoExpand = autoExpandDetails;
+  state.interpretationNotice = options.message || '';
 
   const cardsHtml = state.selectedSpread.positions
     .map((pos, index) => {
@@ -1118,6 +1367,10 @@ function renderCardInterpretations(remoteResults, options = {}) {
       const interpretationId = `interpretation-${pos.id}`;
       const detailsClass = autoExpandDetails ? 'active' : '';
       const buttonLabel = autoExpandDetails ? '收合詳解' : '查看更多';
+      const imageInnerHtml = state.simpleMode ? '' : buildCardImageHtml(card);
+      const imageBlock = imageInnerHtml
+        ? `<div class="card-interpretation__image-wrapper">${imageInnerHtml}</div>`
+        : '';
 
       return `
         <article class="card-interpretation" id="${interpretationId}">
@@ -1125,6 +1378,7 @@ function renderCardInterpretations(remoteResults, options = {}) {
             <h4 class="card-interpretation__title">${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</h4>
             <span class="chip">${cardDisplay}</span>
           </div>
+          ${imageBlock}
           <p class="card-interpretation__summary">${summaryText}</p>
           <p class="card-interpretation__details ${detailsClass}">${detailText}</p>
           <div class="keywords">${keywords}</div>
@@ -1407,6 +1661,9 @@ function resetAll() {
   state.spreadDraws = [];
   state.timestamp = null;
   state.remoteInterpretations = null;
+  state.simpleMode = true;
+  state.interpretationNotice = '';
+  state.interpretationAutoExpand = false;
   resetDeck();
   ui.questionTextarea.value = '';
   ui.analysisResult.textContent = '';
@@ -1421,6 +1678,8 @@ function resetAll() {
   ui.drawManual.disabled = true;
   ui.drawAuto.disabled = true;
   ui.toReading.disabled = true;
+  closeCardLightbox();
+  updateSimpleModeToggle();
 }
 
 function switchPanel(panelId) {

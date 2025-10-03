@@ -15,6 +15,9 @@
   </header>
 
   <main class="app-main">
+    <div class="mode-toggle">
+      <button id="toggle-simple-mode" class="btn ghost" type="button">切換至圖像模式</button>
+    </div>
     <section id="question-section" class="panel active">
       <div class="panel__header">
         <h2>提問與牌陣推薦</h2>
@@ -96,6 +99,15 @@
   <footer class="app-footer">
     <small>© <span id="current-year"></span> Tarot Insight 解牌師 · 為心之所問提供清晰指引。</small>
   </footer>
+
+  <div id="card-lightbox" class="card-lightbox" aria-hidden="true" hidden>
+    <div class="card-lightbox__backdrop" data-lightbox-action="close"></div>
+    <figure class="card-lightbox__content">
+      <button type="button" class="card-lightbox__close" data-lightbox-action="close" aria-label="關閉卡牌放大視圖">×</button>
+      <img id="card-lightbox-image" class="card-lightbox__image card-image" alt="" loading="lazy" />
+      <figcaption id="card-lightbox-caption" class="card-lightbox__caption"></figcaption>
+    </figure>
+  </div>
 
   <script src="app.js"></script>
 </body>
