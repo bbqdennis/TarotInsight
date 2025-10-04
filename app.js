@@ -9,6 +9,7 @@ const state = {
   timestamp: null,
   remoteInterpretations: null,
   simpleMode: false,
+  showAllSpreads: false,
   interpretationNotice: '',
   interpretationAutoExpand: false
 };
@@ -150,7 +151,7 @@ const spreadCatalog = [
     id: 'triple-choice',
     name: '三選一策略陣',
     description: '同時評估三種方案的優勢、挑戰與未來走勢，找到最貼合當下的方向。',
-    cardCount: 7,
+    cardCount: 8,
     highlight: '多方案評估',
     recommendedFor: ['career', 'study', 'general', 'self'],
     positions: [
@@ -159,8 +160,9 @@ const spreadCatalog = [
       { id: 't3', label: '位置 3', title: '方案一提醒', meaning: '導入方案一時需要特別注意的課題。' },
       { id: 't4', label: '位置 4', title: '方案二契合點', meaning: '方案二的核心優勢與支持能量。' },
       { id: 't5', label: '位置 5', title: '方案二提醒', meaning: '採用方案二可能遇到的挑戰與成本。' },
-      { id: 't6', label: '位置 6', title: '方案三洞察', meaning: '方案三展現的關鍵機會與需要留意的面向。' },
-      { id: 't7', label: '位置 7', title: '整體指引', meaning: '綜觀三個方案後，最支持你的思維與行動方向。' }
+      { id: 't6', label: '位置 6', title: '方案三契合點', meaning: '方案三的亮點與可帶來的發展契機。' },
+      { id: 't7', label: '位置 7', title: '方案三提醒', meaning: '導入方案三需要留心的限制與代價。' },
+      { id: 't8', label: '位置 8', title: '整體指引', meaning: '綜觀三個方案後，最支持你的思維與行動方向。' }
     ]
   },
   {
@@ -825,8 +827,9 @@ function attachEventListeners() {
   ui.submitQuestion.addEventListener('click', handleQuestionSubmit);
   ui.skipQuestion.addEventListener('click', () => {
     state.question = '';
-    state.categories = ['general'];
+    state.categories = [];
     state.timestamp = new Date();
+    state.showAllSpreads = true;
     renderAnalysisSummary();
     renderRecommendedSpreads();
   });
@@ -982,6 +985,7 @@ function handleQuestionSubmit() {
     state.question = '';
     state.categories = ['general'];
     state.timestamp = new Date();
+    state.showAllSpreads = false;
     renderRecommendedSpreads();
     return;
   }
@@ -990,6 +994,7 @@ function handleQuestionSubmit() {
   state.timestamp = new Date();
   const categories = analyzeQuestion(question);
   state.categories = categories.length ? categories : ['general'];
+  state.showAllSpreads = false;
 
   renderAnalysisSummary();
   renderRecommendedSpreads();
@@ -1020,8 +1025,8 @@ function analyzeQuestion(question) {
 
 function renderAnalysisSummary() {
   if (!state.question) {
-    ui.analysisResult.classList.add('active');
-    ui.analysisResult.innerHTML = '未輸入問題，提供通用牌陣供快速開始。';
+    ui.analysisResult.classList.remove('active');
+    ui.analysisResult.textContent = '';
     return;
   }
 
@@ -1051,12 +1056,19 @@ function getCategoryDisplay() {
 }
 
 function renderRecommendedSpreads() {
-  const categories = state.categories.length ? state.categories : ['general'];
-  const matched = spreadCatalog.filter((spread) =>
-    spread.recommendedFor.some((tag) => categories.includes(tag))
-  );
+  const sortedCatalog = [...spreadCatalog].sort((a, b) => a.cardCount - b.cardCount);
 
-  const suggestions = matched.length ? matched : spreadCatalog.slice(0, 3);
+  let suggestions;
+  if (state.showAllSpreads) {
+    suggestions = sortedCatalog;
+  } else {
+    const categories = state.categories.length ? state.categories : ['general'];
+    const matched = sortedCatalog.filter((spread) =>
+      spread.recommendedFor.some((tag) => categories.includes(tag))
+    );
+    suggestions = matched.length ? matched : sortedCatalog.slice(0, 3);
+  }
+
   state.recommendedSpreads = suggestions;
 
   ui.recommendedSpreads.innerHTML = suggestions
@@ -1589,6 +1601,7 @@ function buildReportCopyText() {
   const lines = [];
 
   lines.push('Tarot Insight 解牌師 - 解牌報告');
+  lines.push('主站：https://tarotmaster.netlify.app');
   lines.push(`牌陣：${state.selectedSpread.name}`);
   const categories = getCategoryDisplay();
   if (categories) {
@@ -1662,6 +1675,7 @@ function buildShareText() {
   }
   const lines = [];
   lines.push('Tarot Insight 解牌師 - 占卜重點');
+  lines.push('主站：https://tarotmaster.netlify.app');
   if (state.question) {
     lines.push(`提問：${state.question}`);
   }
@@ -1684,6 +1698,7 @@ function resetAll() {
   state.timestamp = null;
   state.remoteInterpretations = null;
   state.simpleMode = false;
+  state.showAllSpreads = false;
   state.interpretationNotice = '';
   state.interpretationAutoExpand = false;
   resetDeck();
