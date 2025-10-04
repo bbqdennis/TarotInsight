@@ -8,7 +8,7 @@ const state = {
   remainingDeck: [],
   timestamp: null,
   remoteInterpretations: null,
-  simpleMode: true,
+  simpleMode: false,
   interpretationNotice: '',
   interpretationAutoExpand: false
 };
@@ -1650,7 +1650,7 @@ function resetAll() {
   state.spreadDraws = [];
   state.timestamp = null;
   state.remoteInterpretations = null;
-  state.simpleMode = true;
+  state.simpleMode = false;
   state.interpretationNotice = '';
   state.interpretationAutoExpand = false;
   resetDeck();
