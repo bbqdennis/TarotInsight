@@ -99,11 +99,24 @@ const categoryKeywords = {
 
 const spreadCatalog = [
   {
+    id: 'daily-oracle',
+    name: '每日運勢牌',
+    description: '以一張牌快速感受今日的能量焦點與提醒，適合日常啟發。',
+    cardCount: 1,
+    highlight: '今日提醒',
+    theme: 'direction',
+    recommendedFor: ['general', 'self', 'love', 'career'],
+    positions: [
+      { id: 'd1', label: '位置 1', title: '今日訊息', meaning: '此刻最需要留意的能量、行動或心態。' }
+    ]
+  },
+  {
     id: 'three-card',
     name: '三張牌洞察陣',
     description: '快速釐清過去、現在與未來，適合多數一般性問題。',
     cardCount: 3,
     highlight: '過去 / 現在 / 未來',
+    theme: 'analysis',
     recommendedFor: ['general', 'career', 'self', 'health', 'finance'],
     positions: [
       { id: 'p1', label: '位置 1', title: '過去', meaning: '影響目前狀況的背景、起因與基礎信念。' },
@@ -117,6 +130,7 @@ const spreadCatalog = [
     description: '完整拆解事件核心、周遭影響與長期趨勢，適合重大決策。',
     cardCount: 10,
     highlight: '全方位解析',
+    theme: 'analysis',
     recommendedFor: ['career', 'love', 'self', 'finance'],
     positions: [
       { id: 'c1', label: '位置 1', title: '現況', meaning: '眼前最核心的議題與能量。' },
@@ -137,6 +151,7 @@ const spreadCatalog = [
     description: '比較兩個選項的動能、收穫與風險，幫助你看見更清晰的抉擇方向。',
     cardCount: 6,
     highlight: '對照選項',
+    theme: 'analysis',
     recommendedFor: ['career', 'love', 'finance', 'general'],
     positions: [
       { id: 'e1', label: '位置 1', title: '核心議題', meaning: '目前情境的本質與決策關鍵。' },
@@ -153,6 +168,7 @@ const spreadCatalog = [
     description: '同時評估三種方案的優勢、挑戰與未來走勢，找到最貼合當下的方向。',
     cardCount: 8,
     highlight: '多方案評估',
+    theme: 'analysis',
     recommendedFor: ['career', 'study', 'general', 'self'],
     positions: [
       { id: 't1', label: '位置 1', title: '現在定位', meaning: '你目前所處的整體狀態與核心需求。' },
@@ -171,6 +187,7 @@ const spreadCatalog = [
     description: '深入剖析一個人的內外在特質，辨識優勢與盲點，適合自我覺察或評估人際互動。',
     cardCount: 5,
     highlight: '內外在透視',
+    theme: 'inner',
     recommendedFor: ['self', 'love', 'career', 'general'],
     positions: [
       { id: 'p1', label: '位置 1', title: '外在面貌', meaning: '他人眼中對此人的印象與行為表現。' },
@@ -186,6 +203,7 @@ const spreadCatalog = [
     description: '探索靈魂目標、潛能與行動方向，協助在轉折期釐清長期願景。',
     cardCount: 6,
     highlight: '靈魂地圖',
+    theme: 'direction',
     recommendedFor: ['self', 'career', 'study', 'general'],
     positions: [
       { id: 'l1', label: '位置 1', title: '現時身份', meaning: '目前你正在扮演的角色與狀態。' },
@@ -202,6 +220,7 @@ const spreadCatalog = [
     description: '一次檢視未來十二個月的能量與主題，適合訂立新年或生日年度計畫。',
     cardCount: 13,
     highlight: '12 個月洞察',
+    theme: 'direction',
     recommendedFor: ['general', 'self', 'career', 'finance'],
     positions: [
       { id: 'y1', label: '位置 1', title: '一月主題', meaning: '新年的開端能量與行動重點。' },
@@ -225,6 +244,7 @@ const spreadCatalog = [
     description: '溫柔探索內在陰影與被壓抑的情緒，協助療癒創傷並整合力量。',
     cardCount: 6,
     highlight: '深層療癒',
+    theme: 'inner',
     recommendedFor: ['self', 'health', 'general'],
     positions: [
       { id: 's1', label: '位置 1', title: '核心陰影', meaning: '此刻最需要被看見的陰影或被壓抑的部分。' },
@@ -241,6 +261,7 @@ const spreadCatalog = [
     description: '聚焦雙方的動機、互動與未來走勢，適合感情與合作議題。',
     cardCount: 6,
     highlight: '雙方視角',
+    theme: 'relationship',
     recommendedFor: ['love', 'career', 'self'],
     positions: [
       { id: 'r1', label: '位置 1', title: '你的現況', meaning: '你在這段關係中的狀態與期待。' },
@@ -257,6 +278,7 @@ const spreadCatalog = [
     description: '從目標、資源到策略與風險評估，協助職場決策與規劃。',
     cardCount: 5,
     highlight: '職涯專用',
+    theme: 'analysis',
     recommendedFor: ['career', 'finance', 'study'],
     positions: [
       { id: 'k1', label: '位置 1', title: '願景', meaning: '你想達成的長期方向與價值。' },
@@ -272,6 +294,7 @@ const spreadCatalog = [
     description: '面向內在需求與療癒方向，適合自我成長與靈性探索。',
     cardCount: 4,
     highlight: '內在旅程',
+    theme: 'inner',
     recommendedFor: ['self', 'health', 'general'],
     positions: [
       { id: 's1', label: '位置 1', title: '內在狀態', meaning: '此刻最需要被看見的情緒與信念。' },
@@ -1126,7 +1149,20 @@ function getCategoryDisplay() {
 }
 
 function renderRecommendedSpreads() {
-  const sortedCatalog = [...spreadCatalog].sort((a, b) => a.cardCount - b.cardCount);
+  const themePriority = ['analysis', 'inner', 'relationship', 'direction'];
+  const themeOrder = themePriority.reduce((acc, theme, index) => {
+    acc[theme] = index;
+    return acc;
+  }, {});
+
+  const sortedCatalog = [...spreadCatalog].sort((a, b) => {
+    const themeA = themeOrder.hasOwnProperty(a.theme) ? themeOrder[a.theme] : themePriority.length;
+    const themeB = themeOrder.hasOwnProperty(b.theme) ? themeOrder[b.theme] : themePriority.length;
+    if (themeA !== themeB) {
+      return themeA - themeB;
+    }
+    return a.cardCount - b.cardCount;
+  });
 
   let suggestions;
   if (state.showAllSpreads) {
@@ -1157,23 +1193,30 @@ function renderRecommendedSpreads() {
 }
 
 function renderSpreadCard(spread) {
+  const themeClass = spread.theme ? ` spread-card--${spread.theme}` : '';
   const positionPreview = spread.positions
     .slice(0, 3)
     .map((pos) => `<li>${pos.title}</li>`)
     .join('');
 
   return `
-    <article class="spread-card">
-      <div>
-        <h3 class="spread-card__title">${spread.name}</h3>
-        <div class="spread-card__meta">
-          <span>共 ${spread.cardCount} 張</span>
-          <span>${spread.highlight}</span>
+    <article class="spread-card${themeClass}">
+      <div class="spread-card__header">
+        <div>
+          <h3 class="spread-card__title">${spread.name}</h3>
+          <div class="spread-card__meta">
+            <span>共 ${spread.cardCount} 張</span>
+          </div>
         </div>
+        ${
+          spread.highlight
+            ? `<span class="spread-card__tag">${spread.highlight}</span>`
+            : ''
+        }
       </div>
       <p>${spread.description}</p>
       <ul class="spread-card__positions">${positionPreview}</ul>
-      <button class="btn primary" data-spread-id="${spread.id}">選擇此牌陣</button>
+      <button class="btn spread-card__action" data-spread-id="${spread.id}">選擇此牌陣</button>
     </article>
   `;
 }
