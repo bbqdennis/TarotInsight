@@ -18,63 +18,6 @@ const ui = {};
 
 const TAROT_API_ENDPOINT = 'https://n8nautorobot.duckdns.org/webhook/tarot_master';
 const TAROT_API_TIMEOUT = 60000;
-const CARD_IMAGE_BASE_PATH = 'Image/LegacyTarot';
-
-const legacyMajorImageMap = {
-  'major-0': '0LMfool-2x.jpg',
-  'major-1': '1LMmagician-2x.jpg',
-  'major-2': '2LMhighpriestess-2x.jpg',
-  'major-3': '3LMempress-2x.jpg',
-  'major-4': '4LMemperor-2x.jpg',
-  'major-5': '5LMfaith-2x.jpg',
-  'major-6': '6LMlovers-2x.jpg',
-  'major-7': '7LMchariot-2x.jpg',
-  'major-8': '8LMstrength-2x.jpg',
-  'major-9': '9LHermit-2x.jpg',
-  'major-10': '10LMwheel-2x.jpg',
-  'major-11': '11LMjustice-2x.jpg',
-  'major-12': '12LMhanging-man-2x.jpg',
-  'major-13': '13LMdeath-2x.jpg',
-  'major-14': '14LMtemperance-2x.jpg',
-  'major-15': '15LMdevil-2x.jpg',
-  'major-16': '16LMtower-2x.jpg',
-  'major-17': '17LMstar-2x.jpg',
-  'major-18': '18LMmoon-2x.jpg',
-  'major-19': '19LMsun-2x.jpg',
-  'major-20': '20LMjudgement-2x.jpg',
-  'major-21': '21LMworld-2x.jpg'
-};
-
-const suitImagePrefix = {
-  wands: 'Lwands',
-  cups: 'Lcups',
-  swords: 'Lswords',
-  pentacles: 'Lcoins'
-};
-
-const minorRankImageSuffix = {
-  ace: '1Ace',
-  '2': '2',
-  '3': '3',
-  '4': '4',
-  '5': '5',
-  '6': '6',
-  '7': '7',
-  '8': '8',
-  '9': '9',
-  '10': '10',
-  page: 'Page',
-  knight: 'KNIGHT',
-  queen: 'Queen',
-  king: 'KING'
-};
-
-const minorSuitSuffixOverrides = {
-  pentacles: {
-    page: 'page',
-    king: 'KINGS'
-  }
-};
 
 function escapeHtml(value) {
   if (typeof value !== 'string') {
@@ -870,17 +813,30 @@ function initializeApp() {
   attachEventListeners();
   updateSimpleModeToggle();
   state.deckBlueprint = generateDeck();
-  resetDeck();
-  setCurrentYear();
+  if (window.SpreadPage && typeof window.SpreadPage.init === 'function') {
+    window.SpreadPage.init({
+      state,
+      ui,
+      spreadCatalog,
+      switchPanel,
+      prepareReading
+    });
+  } else {
+    state.remainingDeck = shuffle(state.deckBlueprint.map((card) => ({ ...card })));
+  }
   if (window.QuestionPage && typeof window.QuestionPage.init === 'function') {
     window.QuestionPage.init({
       state,
       ui,
       spreadCatalog,
-      selectSpread,
+      selectSpread:
+        window.SpreadPage && typeof window.SpreadPage.selectSpread === 'function'
+          ? window.SpreadPage.selectSpread
+          : undefined,
       switchPanel
     });
   }
+  setCurrentYear();
 }
 
 document.addEventListener('DOMContentLoaded', initializeApp);
@@ -918,13 +874,6 @@ function attachEventListeners() {
     ui.toggleSimpleMode.addEventListener('click', toggleSimpleMode);
   }
 
-  ui.drawManual.addEventListener('click', handleManualDraw);
-  ui.drawAuto.addEventListener('click', handleAutoDraw);
-  ui.resetDraw.addEventListener('click', resetSpreadDraw);
-  ui.toReading.addEventListener('click', () => {
-    switchPanel('reading-section');
-    prepareReading();
-  });
   ui.toReport.addEventListener('click', () => {
     prepareReport();
     switchPanel('report-section');
@@ -961,7 +910,9 @@ function attachEventListeners() {
 function toggleSimpleMode() {
   state.simpleMode = !state.simpleMode;
   updateSimpleModeToggle();
-  updatePositionStatus();
+  if (window.SpreadPage && typeof window.SpreadPage.updatePositionStatus === 'function') {
+    window.SpreadPage.updatePositionStatus();
+  }
   if (state.simpleMode) {
     closeCardLightbox();
   }
@@ -1061,203 +1012,6 @@ function closeCardLightbox() {
   }
 }
 
-function selectSpread(spreadId) {
-  const spread = spreadCatalog.find((item) => item.id === spreadId);
-  if (!spread) return;
-
-  state.selectedSpread = spread;
-  resetSpreadDraw();
-  ui.spreadCaption.textContent = `已選擇：${spread.name}`;
-  renderSpreadDetails();
-}
-
-function renderSpreadDetails() {
-  if (!state.selectedSpread) {
-    ui.spreadDetails.innerHTML = '';
-    return;
-  }
-
-  const { selectedSpread } = state;
-  ui.spreadDetails.innerHTML = `
-    <div class="spread-details__header">
-      <h3>${selectedSpread.name}</h3>
-      <p>${selectedSpread.description}</p>
-    </div>
-    <div class="spread-details__positions">
-      ${selectedSpread.positions
-        .map(
-          (pos, index) => `
-            <div class="spread-position" data-position="${pos.id}">
-              <div class="spread-position__info">
-                <div class="spread-position__label">${pos.label} · ${pos.title}</div>
-                <div class="spread-position__meaning">${pos.meaning}</div>
-              </div>
-              <div class="spread-position__status" id="position-card-${index}">
-                尚未抽牌
-              </div>
-            </div>
-          `
-        )
-        .join('')}
-    </div>
-  `;
-
-  updatePositionStatus();
-}
-
-function resetDeck() {
-  state.remainingDeck = shuffle(state.deckBlueprint.map((card) => ({ ...card })));
-}
-
-function resetSpreadDraw() {
-  if (!state.selectedSpread) return;
-
-  resetDeck();
-  const count = state.selectedSpread.cardCount;
-  state.spreadDraws = Array.from({ length: count }, () => null);
-  state.remoteInterpretations = null;
-  state.interpretationNotice = '';
-  state.interpretationAutoExpand = false;
-  ui.drawManual.disabled = false;
-  ui.drawAuto.disabled = false;
-  ui.toReading.disabled = true;
-  updatePositionStatus();
-}
-
-function handleManualDraw() {
-  const nextIndex = state.spreadDraws.findIndex((entry) => entry === null);
-  if (nextIndex === -1) return;
-
-  const card = drawCard();
-  state.spreadDraws[nextIndex] = card;
-  updatePositionStatus();
-  checkDrawCompletion();
-}
-
-function handleAutoDraw() {
-  let nextIndex = state.spreadDraws.findIndex((entry) => entry === null);
-  while (nextIndex !== -1) {
-    state.spreadDraws[nextIndex] = drawCard();
-    nextIndex = state.spreadDraws.findIndex((entry) => entry === null);
-  }
-  updatePositionStatus();
-  checkDrawCompletion();
-}
-
-function drawCard() {
-  if (!state.remainingDeck.length) {
-    resetDeck();
-  }
-
-  const baseCard = state.remainingDeck.pop();
-  const orientation = Math.random() > 0.5 ? 'upright' : 'reversed';
-  const orientationLabel = orientation === 'upright' ? '正位' : '逆位';
-  const meaning = orientation === 'upright' ? baseCard.upright : baseCard.reversed;
-  const insight = orientation === 'upright' ? baseCard.insights.upright : baseCard.insights.reversed;
-
-  return {
-    ...baseCard,
-    orientation,
-    orientationLabel,
-    meaning,
-    insight
-  };
-}
-
-function getCardImagePath(card) {
-  if (!card) {
-    return null;
-  }
-
-  if (card.arcana === 'major') {
-    const filename = legacyMajorImageMap[card.id];
-    return filename ? `${CARD_IMAGE_BASE_PATH}/${filename}` : null;
-  }
-
-  if (card.arcana === 'minor') {
-    const prefix = suitImagePrefix[card.suit];
-    if (!prefix) {
-      return null;
-    }
-
-    const overrides = minorSuitSuffixOverrides[card.suit] || {};
-    const suffix = overrides[card.rank] || minorRankImageSuffix[card.rank];
-    return suffix ? `${CARD_IMAGE_BASE_PATH}/${prefix}-${suffix}-2x.jpg` : null;
-  }
-
-  return null;
-}
-
-function buildCardImageHtml(card) {
-  const imagePath = getCardImagePath(card);
-  if (!imagePath) {
-    return '';
-  }
-
-  const classes = ['card-image', 'js-card-image'];
-  if (card.orientation === 'reversed') {
-    classes.push('is-reversed');
-  }
-
-  const cardLabel = `${card.name} · ${card.orientationLabel}`;
-  const attributes = [
-    `src="${escapeHtml(imagePath)}"`,
-    `data-full-src="${escapeHtml(imagePath)}"`,
-    `alt="${escapeHtml(card.name)}"`,
-    `data-card-label="${escapeHtml(cardLabel)}"`,
-    `data-orientation="${escapeHtml(card.orientation || 'upright')}"`,
-    'loading="lazy"',
-    `class="${classes.join(' ')}"`
-  ];
-
-  return `<img ${attributes.join(' ')} />`;
-}
-
-function buildCardStatusHtml(card, options = {}) {
-  if (!card) {
-    return '<span class="card-status__label">尚未抽牌</span>';
-  }
-
-  const cardLabel = `${escapeHtml(card.name)} · ${escapeHtml(card.orientationLabel)}`;
-  if (state.simpleMode) {
-    return `<span class="card-status__label">${cardLabel}</span>`;
-  }
-
-  const imageHtml = buildCardImageHtml(card);
-  if (!imageHtml) {
-    return `<span class="card-status__label">${cardLabel}</span>`;
-  }
-
-  const alignClass = options.align === 'right' ? ' card-status--right' : '';
-  return `
-    <div class="card-status${alignClass}">
-      ${imageHtml}
-      <span class="card-status__label">${cardLabel}</span>
-    </div>
-  `.trim();
-}
-
-function updatePositionStatus() {
-  if (!state.selectedSpread) return;
-
-  state.selectedSpread.positions.forEach((_, index) => {
-    const card = state.spreadDraws[index];
-    const statusElement = document.getElementById(`position-card-${index}`);
-    if (statusElement) {
-      statusElement.innerHTML = buildCardStatusHtml(card);
-    }
-  });
-}
-
-function checkDrawCompletion() {
-  const completed = state.spreadDraws.every((entry) => entry !== null);
-  if (completed) {
-    ui.drawManual.disabled = true;
-    ui.drawAuto.disabled = true;
-    ui.toReading.disabled = false;
-  }
-}
-
 async function prepareReading() {
   if (!state.selectedSpread) return;
 
@@ -1354,7 +1108,11 @@ function renderCardInterpretations(remoteResults, options = {}) {
       const interpretationId = `interpretation-${pos.id}`;
       const detailsClass = autoExpandDetails ? 'active' : '';
       const buttonLabel = autoExpandDetails ? '收合詳解' : '查看更多';
-      const imageInnerHtml = state.simpleMode ? '' : buildCardImageHtml(card);
+      const imageInnerHtml = state.simpleMode
+        ? ''
+        : window.SpreadPage && typeof window.SpreadPage.buildCardImageHtml === 'function'
+          ? window.SpreadPage.buildCardImageHtml(card)
+          : '';
       const imageBlock = imageInnerHtml
         ? `<div class="card-interpretation__image-wrapper">${imageInnerHtml}</div>`
         : '';
@@ -1654,7 +1412,6 @@ function resetAll() {
   state.showAllSpreads = false;
   state.interpretationNotice = '';
   state.interpretationAutoExpand = false;
-  resetDeck();
   if (window.QuestionPage && typeof window.QuestionPage.reset === 'function') {
     window.QuestionPage.reset();
   } else {
@@ -1669,14 +1426,29 @@ function resetAll() {
       ui.recommendedSpreads.innerHTML = '';
     }
   }
-  ui.spreadCaption.textContent = '請先選擇適合的牌陣。';
-  ui.spreadDetails.innerHTML = '';
+  if (window.SpreadPage && typeof window.SpreadPage.reset === 'function') {
+    window.SpreadPage.reset();
+  } else {
+    if (ui.spreadCaption) {
+      ui.spreadCaption.textContent = '請先選擇適合的牌陣。';
+    }
+    if (ui.spreadDetails) {
+      ui.spreadDetails.innerHTML = '';
+    }
+    if (ui.drawManual) {
+      ui.drawManual.disabled = true;
+    }
+    if (ui.drawAuto) {
+      ui.drawAuto.disabled = true;
+    }
+    if (ui.toReading) {
+      ui.toReading.disabled = true;
+    }
+    state.remainingDeck = shuffle(state.deckBlueprint.map((card) => ({ ...card })));
+  }
   ui.readingOverview.innerHTML = '';
   ui.cardInterpretations.innerHTML = '';
   ui.reportSummary.innerHTML = '';
-  ui.drawManual.disabled = true;
-  ui.drawAuto.disabled = true;
-  ui.toReading.disabled = true;
   closeCardLightbox();
   updateSimpleModeToggle();
 }
