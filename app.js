@@ -850,6 +850,15 @@ function initializeApp() {
       switchPanel
     });
   }
+  if (window.ReportPage && typeof window.ReportPage.init === 'function') {
+    window.ReportPage.init({
+      state,
+      ui,
+      switchPanel,
+      getCategories: () => getCategoryDisplay(),
+      getTimestamp: () => formatTimestamp(state.timestamp)
+    });
+  }
   setCurrentYear();
 }
 
@@ -888,16 +897,6 @@ function attachEventListeners() {
     ui.toggleSimpleMode.addEventListener('click', toggleSimpleMode);
   }
 
-  ui.toReport.addEventListener('click', () => {
-    prepareReport();
-    switchPanel('report-section');
-  });
-  ui.downloadReport.addEventListener('click', () => {
-    window.print();
-  });
-  if (ui.copyReport) {
-    ui.copyReport.addEventListener('click', handleCopyReport);
-  }
   ui.shareLine.addEventListener('click', handleShareLine);
   ui.shareEmail.addEventListener('click', handleShareEmail);
 
@@ -1028,51 +1027,6 @@ function closeCardLightbox() {
   }
 }
 
-function prepareReport() {
-  if (!state.selectedSpread) return;
-
-  const remoteMap =
-    window.ReadingPage && typeof window.ReadingPage.getRemoteInterpretationMap === 'function'
-      ? window.ReadingPage.getRemoteInterpretationMap(state.remoteInterpretations)
-      : new Map();
-
-  const headerHtml = `
-    <div class="report-summary__header">
-      <h3>${escapeHtml(state.selectedSpread.name)}</h3>
-      ${state.question ? `<p>提問：${escapeHtml(state.question)}</p>` : ''}
-      <p class="report-summary__meta">時間：${escapeHtml(formatTimestamp(state.timestamp))} · 主題：${escapeHtml(getCategoryDisplay())}</p>
-    </div>
-  `;
-
-  const listHtml = state.selectedSpread.positions
-    .map((pos, index) => {
-      const card = state.spreadDraws[index];
-      if (!card) return '';
-      const remote = remoteMap.get(pos.title) || remoteMap.get(pos.label);
-      const cardDisplay = remote?.card
-        ? escapeHtml(remote.card)
-        : `${escapeHtml(card.name)}（${escapeHtml(card.orientationLabel)}）`;
-      const summaryText = remote?.interpretation
-        ? escapeHtml(remote.interpretation)
-        : escapeHtml(card.meaning);
-      const adviceText = remote?.advice ? escapeHtml(remote.advice) : escapeHtml(card.insight);
-      const adviceHtml = adviceText
-        ? `<span class="report-summary__meta">${adviceText}</span>`
-        : '';
-      return `
-        <div class="report-summary__item">
-          <strong>${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</strong>
-          <span>${cardDisplay}</span>
-          <span>${summaryText}</span>
-          ${adviceHtml}
-        </div>
-      `;
-    })
-    .join('');
-
-  ui.reportSummary.innerHTML = `${headerHtml}<div class="report-summary__list">${listHtml}</div>`;
-}
-
 function handleShareLine() {
   const text = encodeURIComponent(buildShareText());
   const url = `https://social-plugins.line.me/lineit/share?text=${text}`;
@@ -1085,80 +1039,11 @@ function handleShareEmail() {
   window.location.href = `mailto:?subject=${subject}&body=${body}`;
 }
 
-async function handleCopyReport() {
-  if (!state.selectedSpread || !ui.copyReport) return;
-
-  const text = buildReportCopyText();
-  if (!text) {
-    return;
-  }
-
-  const button = ui.copyReport;
-  const originalLabel = button.dataset.originalLabel || button.textContent;
-  button.dataset.originalLabel = originalLabel;
-  button.disabled = true;
-
-  let success = true;
-  try {
-    await copyToClipboard(text);
-  } catch (error) {
-    success = false;
-    console.error('Failed to copy report:', error);
-  }
-
-  button.textContent = success ? '已複製' : '複製失敗';
-
-  setTimeout(() => {
-    button.textContent = button.dataset.originalLabel;
-    button.disabled = false;
-  }, 2000);
-}
-
 function buildReportCopyText() {
-  if (!state.selectedSpread) return '';
-
-  const remoteMap =
-    window.ReadingPage && typeof window.ReadingPage.getRemoteInterpretationMap === 'function'
-      ? window.ReadingPage.getRemoteInterpretationMap(state.remoteInterpretations)
-      : new Map();
-  const lines = [];
-
-  lines.push('Tarot Insight 解牌師 - 解牌報告');
-  lines.push('主站：https://tarotmaster.netlify.app');
-  lines.push(`牌陣：${state.selectedSpread.name}`);
-  const categories = getCategoryDisplay();
-  if (categories) {
-    lines.push(`主題：${categories}`);
+  if (window.ReportPage && typeof window.ReportPage.buildCopyText === 'function') {
+    return window.ReportPage.buildCopyText();
   }
-  const when = formatTimestamp(state.timestamp);
-  if (when) {
-    lines.push(`時間：${when}`);
-  }
-  if (state.question) {
-    lines.push(`提問：「${state.question}」`);
-  }
-  lines.push('');
-
-  state.selectedSpread.positions.forEach((pos, index) => {
-    const card = state.spreadDraws[index];
-    if (!card) return;
-    const remote = remoteMap.get(pos.title) || remoteMap.get(pos.label);
-    const cardDisplay = remote?.card || `${card.name}（${card.orientationLabel}）`;
-    const summaryText = remote?.interpretation || card.meaning;
-    const adviceText = remote?.advice || card.insight;
-
-    lines.push(`${pos.label} · ${pos.title}`);
-    lines.push(`卡牌：${cardDisplay}`);
-    if (summaryText) {
-      lines.push(`重點：${summaryText}`);
-    }
-    if (adviceText) {
-      lines.push(`建議：${adviceText}`);
-    }
-    lines.push('');
-  });
-
-  return lines.join('\n').trim();
+  return '';
 }
 
 async function copyToClipboard(text) {
@@ -1193,6 +1078,9 @@ async function copyToClipboard(text) {
 }
 
 function buildShareText() {
+  if (window.ReportPage && typeof window.ReportPage.buildShareText === 'function') {
+    return window.ReportPage.buildShareText();
+  }
   if (!state.selectedSpread) {
     return 'Tarot Insight 解牌師 - 歡迎體驗完整的解牌流程。';
   }
@@ -1240,6 +1128,9 @@ function resetAll() {
   }
   if (window.ReadingPage && typeof window.ReadingPage.reset === 'function') {
     window.ReadingPage.reset();
+  }
+  if (window.ReportPage && typeof window.ReportPage.reset === 'function') {
+    window.ReportPage.reset();
   }
   if (window.SpreadPage && typeof window.SpreadPage.reset === 'function') {
     window.SpreadPage.reset();
