@@ -304,6 +304,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: background var(--transition), transform var(--transition);
+  z-index: 2;
 }
 
 .card-lightbox__close:hover {
