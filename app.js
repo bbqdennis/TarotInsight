@@ -112,7 +112,7 @@ const spreadCatalog = [
   },
   {
     id: 'celtic-cross',
-    name: '十字架深度陣',
+    name: '塞爾特十字牌陣',
     description: '完整拆解事件核心、周遭影響與長期趨勢，適合重大決策。',
     cardCount: 10,
     highlight: '全方位解析',
@@ -128,6 +128,39 @@ const spreadCatalog = [
       { id: 'c8', label: '位置 8', title: '外在影響', meaning: '環境、人際或制度層面的作用。' },
       { id: 'c9', label: '位置 9', title: '盼望與恐懼', meaning: '內在渴望與擔憂之間的拉鋸。' },
       { id: 'c10', label: '位置 10', title: '結果趨勢', meaning: '綜合能量之下，潛在的未來走向。' }
+    ]
+  },
+  {
+    id: 'either-or',
+    name: '二選一決策陣',
+    description: '比較兩個選項的動能、收穫與風險，幫助你看見更清晰的抉擇方向。',
+    cardCount: 6,
+    highlight: '對照選項',
+    recommendedFor: ['career', 'love', 'finance', 'general'],
+    positions: [
+      { id: 'e1', label: '位置 1', title: '核心議題', meaning: '目前情境的本質與決策關鍵。' },
+      { id: 'e2', label: '位置 2', title: '選項 A 優勢', meaning: '選項 A 能帶來的主要收穫與支持。' },
+      { id: 'e3', label: '位置 3', title: '選項 A 提醒', meaning: '採取選項 A 需要留意的限制與風險。' },
+      { id: 'e4', label: '位置 4', title: '選項 B 優勢', meaning: '選項 B 能帶來的可能性與資源。' },
+      { id: 'e5', label: '位置 5', title: '選項 B 提醒', meaning: '採取選項 B 需要注意的隱憂與代價。' },
+      { id: 'e6', label: '位置 6', title: '整體建議', meaning: '綜合以上資訊，協助你做出最合適的決定。' }
+    ]
+  },
+  {
+    id: 'triple-choice',
+    name: '三選一策略陣',
+    description: '同時評估三種方案的優勢、挑戰與未來走勢，找到最貼合當下的方向。',
+    cardCount: 7,
+    highlight: '多方案評估',
+    recommendedFor: ['career', 'study', 'general', 'self'],
+    positions: [
+      { id: 't1', label: '位置 1', title: '現在定位', meaning: '你目前所處的整體狀態與核心需求。' },
+      { id: 't2', label: '位置 2', title: '方案一契合點', meaning: '方案一最有利的能量與可能帶來的發展。' },
+      { id: 't3', label: '位置 3', title: '方案一提醒', meaning: '導入方案一時需要特別注意的課題。' },
+      { id: 't4', label: '位置 4', title: '方案二契合點', meaning: '方案二的核心優勢與支持能量。' },
+      { id: 't5', label: '位置 5', title: '方案二提醒', meaning: '採用方案二可能遇到的挑戰與成本。' },
+      { id: 't6', label: '位置 6', title: '方案三洞察', meaning: '方案三展現的關鍵機會與需要留意的面向。' },
+      { id: 't7', label: '位置 7', title: '整體指引', meaning: '綜觀三個方案後，最支持你的思維與行動方向。' }
     ]
   },
   {
