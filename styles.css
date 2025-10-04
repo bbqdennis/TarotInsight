@@ -282,18 +282,20 @@ body {
   padding: 16px;
   border: 1px dashed rgba(106, 79, 200, 0.2);
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
 }
 
 .spread-position__info {
-  flex: 1;
+  width: 100%;
 }
 
 .spread-position__status {
-  min-width: 160px;
+  min-width: auto;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -366,27 +368,20 @@ body {
   width: 120px;
 }
 
-.deck-visual {
-  width: 100%;
-  max-width: 220px;
-  height: 140px;
-  margin: 0 auto 16px;
-  position: relative;
+.spread-position__status .card-image {
+  width: 150px;
 }
 
-.deck-visual::before,
-.deck-visual::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-md);
-  border: 2px solid rgba(106, 79, 200, 0.4);
-  background: linear-gradient(135deg, rgba(106, 79, 200, 0.12), rgba(240, 198, 116, 0.2));
-  box-shadow: var(--shadow-card);
+.spread-position__status .card-image:hover {
+  transform: scale(1.5);
 }
 
-.deck-visual::after {
-  transform: translate(10px, -10px);
+.spread-position__status .card-image.is-reversed {
+  transform: rotate(180deg) scale(1);
+}
+
+.spread-position__status .card-image.is-reversed:hover {
+  transform: rotate(180deg) scale(1.5);
 }
 
 .card-interpretations {
@@ -432,6 +427,18 @@ body {
 
 .card-interpretation__image-wrapper .card-image {
   width: min(220px, 55vw);
+}
+
+.card-interpretation__image-wrapper .card-image:hover {
+  transform: scale(1.5);
+}
+
+.card-interpretation__image-wrapper .card-image.is-reversed {
+  transform: rotate(180deg) scale(1);
+}
+
+.card-interpretation__image-wrapper .card-image.is-reversed:hover {
+  transform: rotate(180deg) scale(1.5);
 }
 
 .card-interpretation__header {

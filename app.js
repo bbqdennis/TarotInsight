@@ -770,8 +770,6 @@ function cacheElements() {
   ui.drawManual = document.getElementById('draw-manual');
   ui.drawAuto = document.getElementById('draw-auto');
   ui.resetDraw = document.getElementById('reset-draw');
-  ui.deckVisual = document.getElementById('deck-visual');
-  ui.positionStatus = document.getElementById('position-status');
   ui.toReading = document.getElementById('to-reading');
   ui.readingOverview = document.getElementById('reading-overview');
   ui.cardInterpretations = document.getElementById('card-interpretations');
@@ -1244,22 +1242,13 @@ function buildCardStatusHtml(card, options = {}) {
 function updatePositionStatus() {
   if (!state.selectedSpread) return;
 
-  const items = state.selectedSpread.positions.map((pos, index) => {
+  state.selectedSpread.positions.forEach((_, index) => {
     const card = state.spreadDraws[index];
     const statusElement = document.getElementById(`position-card-${index}`);
     if (statusElement) {
       statusElement.innerHTML = buildCardStatusHtml(card);
     }
-
-    return `
-      <li>
-        <span>${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</span>
-        <div class="position-status__card">${buildCardStatusHtml(card, { align: 'right' })}</div>
-      </li>
-    `;
   });
-
-  ui.positionStatus.innerHTML = items.join('');
 }
 
 function checkDrawCompletion() {
@@ -1671,7 +1660,6 @@ function resetAll() {
   ui.recommendedSpreads.innerHTML = '';
   ui.spreadCaption.textContent = '請先選擇適合的牌陣。';
   ui.spreadDetails.innerHTML = '';
-  ui.positionStatus.innerHTML = '';
   ui.readingOverview.innerHTML = '';
   ui.cardInterpretations.innerHTML = '';
   ui.reportSummary.innerHTML = '';
