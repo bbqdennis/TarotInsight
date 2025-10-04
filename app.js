@@ -813,13 +813,27 @@ function initializeApp() {
   attachEventListeners();
   updateSimpleModeToggle();
   state.deckBlueprint = generateDeck();
+  if (window.ReadingPage && typeof window.ReadingPage.init === 'function') {
+    window.ReadingPage.init({
+      state,
+      ui,
+      switchPanel,
+      api: {
+        endpoint: TAROT_API_ENDPOINT,
+        timeout: TAROT_API_TIMEOUT
+      }
+    });
+  }
   if (window.SpreadPage && typeof window.SpreadPage.init === 'function') {
     window.SpreadPage.init({
       state,
       ui,
       spreadCatalog,
       switchPanel,
-      prepareReading
+      prepareReading:
+        window.ReadingPage && typeof window.ReadingPage.prepareReading === 'function'
+          ? window.ReadingPage.prepareReading
+          : undefined
     });
   } else {
     state.remainingDeck = shuffle(state.deckBlueprint.map((card) => ({ ...card })));
@@ -928,7 +942,9 @@ function toggleSimpleMode() {
   if (state.interpretationNotice) {
     options.message = state.interpretationNotice;
   }
-  renderCardInterpretations(undefined, options);
+  if (window.ReadingPage && typeof window.ReadingPage.renderCardInterpretations === 'function') {
+    window.ReadingPage.renderCardInterpretations(undefined, options);
+  }
 }
 
 function updateSimpleModeToggle() {
@@ -1012,220 +1028,13 @@ function closeCardLightbox() {
   }
 }
 
-async function prepareReading() {
-  if (!state.selectedSpread) return;
-
-  if (!state.timestamp) {
-    state.timestamp = new Date();
-  }
-
-  state.interpretationNotice = '';
-  state.interpretationAutoExpand = false;
-  renderReadingSummary();
-  ui.cardInterpretations.innerHTML = '<div class="card-interpretation__loading">正在生成解牌內容...</div>';
-  state.remoteInterpretations = null;
-
-  const questionPayload = buildQuestionPayload();
-  if (!questionPayload) {
-    renderCardInterpretations();
-    return;
-  }
-
-  try {
-    const remoteResults = await fetchTarotInterpretations(questionPayload);
-    if (Array.isArray(remoteResults) && remoteResults.length) {
-      state.remoteInterpretations = remoteResults;
-      renderCardInterpretations(remoteResults, { autoExpand: true });
-    } else {
-      state.remoteInterpretations = null;
-      renderCardInterpretations(null, {
-        message: '暫無線上解牌結果，以下為基本解析。'
-      });
-    }
-  } catch (error) {
-    console.error('Failed to fetch tarot insights:', error);
-    state.remoteInterpretations = null;
-    renderCardInterpretations(null, {
-      message: '目前無法連線取得線上解析，以下為基礎解讀。'
-    });
-  }
-}
-
-function renderReadingSummary() {
-  if (!state.selectedSpread) return;
-
-  const summaryItems = state.selectedSpread.positions.map((pos, index) => {
-    const card = state.spreadDraws[index];
-    const cardLabel = card ? card.name : '尚未抽牌';
-    return `<div class="chip">${escapeHtml(pos.title)}：${escapeHtml(cardLabel)}</div>`;
-  });
-
-  const questionLine = state.question ? `<p>提問：「${escapeHtml(state.question)}」</p>` : '';
-
-  ui.readingOverview.innerHTML = `
-    <div class="reading-overview__meta">
-      <h3>${escapeHtml(state.selectedSpread.name)}</h3>
-      <p>共 ${state.selectedSpread.cardCount} 張牌 · 問題主題：${escapeHtml(getCategoryDisplay())}</p>
-      ${questionLine}
-    </div>
-    <div class="reading-overview__chips">${summaryItems.join('')}</div>
-  `;
-}
-
-function renderCardInterpretations(remoteResults, options = {}) {
-  if (!state.selectedSpread) return;
-
-  const effectiveRemote =
-    remoteResults === undefined ? state.remoteInterpretations : remoteResults;
-  const remoteMap = buildRemoteInterpretationMap(effectiveRemote);
-
-  const autoExpandDetails = Boolean(options.autoExpand);
-  state.interpretationAutoExpand = autoExpandDetails;
-  state.interpretationNotice = options.message || '';
-
-  const cardsHtml = state.selectedSpread.positions
-    .map((pos, index) => {
-      const card = state.spreadDraws[index];
-      if (!card) return '';
-
-      const remote = remoteMap.get(pos.title) || remoteMap.get(pos.label);
-      const baseDetail = buildDetailText(pos, card);
-      const summaryText = remote?.interpretation ? escapeHtml(remote.interpretation) : escapeHtml(card.meaning);
-      const detailParts = [];
-      if (remote?.advice) {
-        detailParts.push(escapeHtml(remote.advice));
-      }
-      if (remote) {
-        if (!detailParts.length && remote.interpretation) {
-          detailParts.push(escapeHtml(remote.interpretation));
-        }
-      } else {
-        detailParts.push(escapeHtml(baseDetail));
-      }
-      const detailText = detailParts.join('<br><br>');
-      const cardDisplay = remote?.card ? escapeHtml(remote.card) : `${escapeHtml(card.name)} · ${escapeHtml(card.orientationLabel)}`;
-      const keywords = card.keywords.map((keyword) => `<span>${escapeHtml(keyword)}</span>`).join('');
-      const interpretationId = `interpretation-${pos.id}`;
-      const detailsClass = autoExpandDetails ? 'active' : '';
-      const buttonLabel = autoExpandDetails ? '收合詳解' : '查看更多';
-      const imageInnerHtml = state.simpleMode
-        ? ''
-        : window.SpreadPage && typeof window.SpreadPage.buildCardImageHtml === 'function'
-          ? window.SpreadPage.buildCardImageHtml(card)
-          : '';
-      const imageBlock = imageInnerHtml
-        ? `<div class="card-interpretation__image-wrapper">${imageInnerHtml}</div>`
-        : '';
-
-      return `
-        <article class="card-interpretation" id="${interpretationId}">
-          <div class="card-interpretation__header">
-            <h4 class="card-interpretation__title">${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</h4>
-            <span class="chip">${cardDisplay}</span>
-          </div>
-          ${imageBlock}
-          <p class="card-interpretation__summary">${summaryText}</p>
-          <p class="card-interpretation__details ${detailsClass}">${detailText}</p>
-          <div class="keywords">${keywords}</div>
-          <button class="btn ghost" data-toggle="details">${buttonLabel}</button>
-        </article>
-      `;
-    })
-    .join('');
-
-  const messageHtml = options.message ? `<div class="card-interpretation__notice">${escapeHtml(options.message)}</div>` : '';
-  ui.cardInterpretations.innerHTML = `${messageHtml}${cardsHtml}`;
-
-  ui.cardInterpretations.querySelectorAll('[data-toggle="details"]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const details = button.parentElement.querySelector('.card-interpretation__details');
-      if (details.classList.contains('active')) {
-        details.classList.remove('active');
-        button.textContent = '查看更多';
-      } else {
-        details.classList.add('active');
-        button.textContent = '收合詳解';
-      }
-    });
-  });
-}
-
-function buildQuestionPayload() {
-  if (!state.selectedSpread) return '';
-
-  const lines = [];
-  lines.push(state.selectedSpread.name);
-  lines.push(`共 ${state.selectedSpread.cardCount} 張牌 · 問題主題：${getCategoryDisplay()}`);
-  if (state.question) {
-    lines.push(`提問：「${state.question}」`);
-  }
-
-  state.selectedSpread.positions.forEach((pos, index) => {
-    const card = state.spreadDraws[index];
-    if (!card) return;
-    lines.push(`${pos.title}：${card.name} · ${card.orientationLabel}`);
-  });
-
-  return lines.join('\n');
-}
-
-async function fetchTarotInterpretations(questionPayload) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TAROT_API_TIMEOUT);
-
-  try {
-    const response = await fetch(TAROT_API_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'n8n-key': 'connect-to-n8n'
-      },
-      body: JSON.stringify({ question: questionPayload }),
-      signal: controller.signal
-    });
-
-    if (!response.ok) {
-      throw new Error(`Tarot API responded with status ${response.status}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      throw new Error('Tarot API request timed out');
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-function buildRemoteInterpretationMap(remoteResults) {
-  const map = new Map();
-  if (!Array.isArray(remoteResults)) {
-    return map;
-  }
-  remoteResults.forEach((item) => {
-    if (item && item.position) {
-      map.set(item.position, item);
-    }
-  });
-  return map;
-}
-
-function buildDetailText(position, card) {
-  const base = `${position.title}代表${position.meaning}`;
-  const detail = card.detail;
-  const insight = card.insight;
-  const questionRef = state.question ? `結合你的提問「${state.question}」，此牌提醒：${card.insight}` : card.insight;
-
-  return `${base}。${detail} ${questionRef}`;
-}
-
 function prepareReport() {
   if (!state.selectedSpread) return;
 
-  const remoteMap = buildRemoteInterpretationMap(state.remoteInterpretations);
+  const remoteMap =
+    window.ReadingPage && typeof window.ReadingPage.getRemoteInterpretationMap === 'function'
+      ? window.ReadingPage.getRemoteInterpretationMap(state.remoteInterpretations)
+      : new Map();
 
   const headerHtml = `
     <div class="report-summary__header">
@@ -1308,7 +1117,10 @@ async function handleCopyReport() {
 function buildReportCopyText() {
   if (!state.selectedSpread) return '';
 
-  const remoteMap = buildRemoteInterpretationMap(state.remoteInterpretations);
+  const remoteMap =
+    window.ReadingPage && typeof window.ReadingPage.getRemoteInterpretationMap === 'function'
+      ? window.ReadingPage.getRemoteInterpretationMap(state.remoteInterpretations)
+      : new Map();
   const lines = [];
 
   lines.push('Tarot Insight 解牌師 - 解牌報告');
@@ -1425,6 +1237,9 @@ function resetAll() {
     if (ui.recommendedSpreads) {
       ui.recommendedSpreads.innerHTML = '';
     }
+  }
+  if (window.ReadingPage && typeof window.ReadingPage.reset === 'function') {
+    window.ReadingPage.reset();
   }
   if (window.SpreadPage && typeof window.SpreadPage.reset === 'function') {
     window.SpreadPage.reset();
