@@ -95,20 +95,20 @@
   cursor: zoom-in;
 }
 
-.card-image:hover {
-  transform: scale(1.08);
-}
-
 .card-image.is-reversed {
   transform: rotate(180deg) scale(1);
 }
 
-.card-image.is-reversed:hover {
-  transform: rotate(180deg) scale(1.08);
-}
-
 .card-status .card-image {
   width: 120px;
+}
+
+.card-status .card-image:hover {
+  transform: scale(1.08);
+}
+
+.card-status .card-image.is-reversed:hover {
+  transform: rotate(180deg) scale(1.08);
 }
 
 .spread-position__status .card-image {
