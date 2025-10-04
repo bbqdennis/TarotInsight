@@ -166,6 +166,76 @@ const spreadCatalog = [
     ]
   },
   {
+    id: 'persona-insight',
+    name: '人格剖析陣',
+    description: '深入剖析一個人的內外在特質，辨識優勢與盲點，適合自我覺察或評估人際互動。',
+    cardCount: 5,
+    highlight: '內外在透視',
+    recommendedFor: ['self', 'love', 'career', 'general'],
+    positions: [
+      { id: 'p1', label: '位置 1', title: '外在面貌', meaning: '他人眼中對此人的印象與行為表現。' },
+      { id: 'p2', label: '位置 2', title: '內在真我', meaning: '此人內心最真實的渴望與動機。' },
+      { id: 'p3', label: '位置 3', title: '優勢天賦', meaning: '天生擁有的長處與可發揮的能力。' },
+      { id: 'p4', label: '位置 4', title: '潛在挑戰', meaning: '容易忽略的盲點、限制或防衛模式。' },
+      { id: 'p5', label: '位置 5', title: '靈魂課題', meaning: '當下最需要面對並整合的成長方向。' }
+    ]
+  },
+  {
+    id: 'life-purpose',
+    name: '人生使命藍圖陣',
+    description: '探索靈魂目標、潛能與行動方向，協助在轉折期釐清長期願景。',
+    cardCount: 6,
+    highlight: '靈魂地圖',
+    recommendedFor: ['self', 'career', 'study', 'general'],
+    positions: [
+      { id: 'l1', label: '位置 1', title: '現時身份', meaning: '目前你正在扮演的角色與狀態。' },
+      { id: 'l2', label: '位置 2', title: '靈魂呼喚', meaning: '內心深處真正渴望的方向與使命。' },
+      { id: 'l3', label: '位置 3', title: '潛在天賦', meaning: '尚待發揮的能力、才華與資源。' },
+      { id: 'l4', label: '位置 4', title: '當前障礙', meaning: '阻礙你實現願景的關鍵課題。' },
+      { id: 'l5', label: '位置 5', title: '支援力量', meaning: '可依靠的人脈、資源或精神支持。' },
+      { id: 'l6', label: '位置 6', title: '使命之路', meaning: '前行方向與最終目標的核心提示。' }
+    ]
+  },
+  {
+    id: 'year-ahead',
+    name: '年度預測陣',
+    description: '一次檢視未來十二個月的能量與主題，適合訂立新年或生日年度計畫。',
+    cardCount: 13,
+    highlight: '12 個月洞察',
+    recommendedFor: ['general', 'self', 'career', 'finance'],
+    positions: [
+      { id: 'y1', label: '位置 1', title: '一月主題', meaning: '新年的開端能量與行動重點。' },
+      { id: 'y2', label: '位置 2', title: '二月主題', meaning: '二月的發展方向與提醒。' },
+      { id: 'y3', label: '位置 3', title: '三月主題', meaning: '三月份的能量焦點與事件趨勢。' },
+      { id: 'y4', label: '位置 4', title: '四月主題', meaning: '春季轉折中的提示與成長。' },
+      { id: 'y5', label: '位置 5', title: '五月主題', meaning: '五月需要掌握的機會與課題。' },
+      { id: 'y6', label: '位置 6', title: '六月主題', meaning: '年中調整與能量平衡的重點。' },
+      { id: 'y7', label: '位置 7', title: '七月主題', meaning: '夏季高峰期的提醒與關鍵行動。' },
+      { id: 'y8', label: '位置 8', title: '八月主題', meaning: '八月的重要趨勢與協調方向。' },
+      { id: 'y9', label: '位置 9', title: '九月主題', meaning: '秋季開端的學習與整備重點。' },
+      { id: 'y10', label: '位置 10', title: '十月主題', meaning: '十月份的人際、事業或生活變化。' },
+      { id: 'y11', label: '位置 11', title: '十一月主題', meaning: '年末前需要回顧與深化的面向。' },
+      { id: 'y12', label: '位置 12', title: '十二月主題', meaning: '年度收尾的整合與祝福。' },
+      { id: 'y13', label: '位置 13', title: '年度總覽', meaning: '貫穿全年的核心課題與靈魂成長方向。' }
+    ]
+  },
+  {
+    id: 'shadow-work',
+    name: '陰影工作陣',
+    description: '溫柔探索內在陰影與被壓抑的情緒，協助療癒創傷並整合力量。',
+    cardCount: 6,
+    highlight: '深層療癒',
+    recommendedFor: ['self', 'health', 'general'],
+    positions: [
+      { id: 's1', label: '位置 1', title: '核心陰影', meaning: '此刻最需要被看見的陰影或被壓抑的部分。' },
+      { id: 's2', label: '位置 2', title: '影響層面', meaning: '這股陰影如何影響你的行為、人際或選擇。' },
+      { id: 's3', label: '位置 3', title: '根源起點', meaning: '陰影形成的來源，可能是童年、過往事件或創傷。' },
+      { id: 's4', label: '位置 4', title: '逃避模式', meaning: '你習慣用什麼方式避開或壓抑這份感受。' },
+      { id: 's5', label: '位置 5', title: '整合指引', meaning: '可以採取的療癒行動與整合方法。' },
+      { id: 's6', label: '位置 6', title: '轉化力量', meaning: '完成整合後可獲得的力量與新視角。' }
+    ]
+  },
+  {
     id: 'relationship-balance',
     name: '關係互動解析陣',
     description: '聚焦雙方的動機、互動與未來走勢，適合感情與合作議題。',
