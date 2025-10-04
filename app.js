@@ -88,15 +88,6 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
-const categoryKeywords = {
-  love: ['愛情', '感情', '戀人', '伴侶', '婚姻', '關係', '曖昧', '分手', '復合', '感受', '桃花'],
-  career: ['工作', '職涯', '升遷', '職場', '老闆', '同事', '創業', '面試', '事業', '專案'],
-  finance: ['財務', '金錢', '收入', '投資', '理財', '資金', '薪水', '負債', '購屋'],
-  health: ['健康', '身體', '養生', '醫療', '睡眠', '壓力', '飲食'],
-  self: ['自我', '成長', '靈性', '人生', '目標', '方向', '迷惘', '情緒', '療癒', '內在'],
-  study: ['學業', '課業', '考試', '學習', '研究', '留學']
-};
-
 const spreadCatalog = [
   {
     id: 'daily-oracle',
@@ -881,6 +872,15 @@ function initializeApp() {
   state.deckBlueprint = generateDeck();
   resetDeck();
   setCurrentYear();
+  if (window.QuestionPage && typeof window.QuestionPage.init === 'function') {
+    window.QuestionPage.init({
+      state,
+      ui,
+      spreadCatalog,
+      selectSpread,
+      switchPanel
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initializeApp);
@@ -917,15 +917,6 @@ function attachEventListeners() {
   if (ui.toggleSimpleMode) {
     ui.toggleSimpleMode.addEventListener('click', toggleSimpleMode);
   }
-  ui.submitQuestion.addEventListener('click', handleQuestionSubmit);
-  ui.skipQuestion.addEventListener('click', () => {
-    state.question = '';
-    state.categories = [];
-    state.timestamp = new Date();
-    state.showAllSpreads = true;
-    renderAnalysisSummary();
-    renderRecommendedSpreads();
-  });
 
   ui.drawManual.addEventListener('click', handleManualDraw);
   ui.drawAuto.addEventListener('click', handleAutoDraw);
@@ -1068,157 +1059,6 @@ function closeCardLightbox() {
     ui.lightboxCaption.textContent = '';
     ui.lightboxCaption.style.display = 'none';
   }
-}
-
-function handleQuestionSubmit() {
-  const question = ui.questionTextarea.value.trim();
-  if (!question) {
-    ui.analysisResult.classList.remove('active');
-    ui.analysisResult.textContent = '';
-    state.question = '';
-    state.categories = ['general'];
-    state.timestamp = new Date();
-    state.showAllSpreads = false;
-    renderRecommendedSpreads();
-    return;
-  }
-
-  state.question = question;
-  state.timestamp = new Date();
-  const categories = analyzeQuestion(question);
-  state.categories = categories.length ? categories : ['general'];
-  state.showAllSpreads = false;
-
-  renderAnalysisSummary();
-  renderRecommendedSpreads();
-}
-
-function analyzeQuestion(question) {
-  const normalized = question.toLowerCase();
-  const results = {};
-
-  Object.entries(categoryKeywords).forEach(([category, keywords]) => {
-    const score = keywords.reduce((acc, keyword) => {
-      if (normalized.includes(keyword.toLowerCase())) {
-        return acc + 1;
-      }
-      return acc;
-    }, 0);
-    if (score > 0) {
-      results[category] = score;
-    }
-  });
-
-  const sorted = Object.entries(results)
-    .sort((a, b) => b[1] - a[1])
-    .map(([category]) => category);
-
-  return sorted;
-}
-
-function renderAnalysisSummary() {
-  if (!state.question) {
-    ui.analysisResult.classList.remove('active');
-    ui.analysisResult.textContent = '';
-    return;
-  }
-
-  const categoryLabels = getCategoryDisplay();
-  ui.analysisResult.classList.add('active');
-  ui.analysisResult.innerHTML = `問題主題傾向：<strong>${categoryLabels}</strong>。已為你挑選最契合的牌陣。`;
-}
-
-function mapCategoryLabel(category) {
-  const mapping = {
-    love: '感情 / 關係',
-    career: '工作 / 職涯',
-    finance: '財務 / 物質',
-    health: '健康 / 身心',
-    self: '自我成長',
-    study: '學習 / 考試',
-    general: '通用' 
-  };
-  return mapping[category] || category;
-}
-
-function getCategoryDisplay() {
-  if (!state.categories || !state.categories.length) {
-    return '通用';
-  }
-  return state.categories.map(mapCategoryLabel).join('、');
-}
-
-function renderRecommendedSpreads() {
-  const themePriority = ['analysis', 'inner', 'relationship', 'direction'];
-  const themeOrder = themePriority.reduce((acc, theme, index) => {
-    acc[theme] = index;
-    return acc;
-  }, {});
-
-  const sortedCatalog = [...spreadCatalog].sort((a, b) => {
-    const themeA = themeOrder.hasOwnProperty(a.theme) ? themeOrder[a.theme] : themePriority.length;
-    const themeB = themeOrder.hasOwnProperty(b.theme) ? themeOrder[b.theme] : themePriority.length;
-    if (themeA !== themeB) {
-      return themeA - themeB;
-    }
-    return a.cardCount - b.cardCount;
-  });
-
-  let suggestions;
-  if (state.showAllSpreads) {
-    suggestions = sortedCatalog;
-  } else {
-    const categories = state.categories.length ? state.categories : ['general'];
-    const matched = sortedCatalog.filter((spread) =>
-      spread.recommendedFor.some((tag) => categories.includes(tag))
-    );
-    suggestions = matched.length ? matched : sortedCatalog.slice(0, 3);
-  }
-
-  state.recommendedSpreads = suggestions;
-
-  ui.recommendedSpreads.innerHTML = suggestions
-    .map((spread) => renderSpreadCard(spread))
-    .join('');
-
-  suggestions.forEach((spread) => {
-    const button = document.querySelector(`button[data-spread-id="${spread.id}"]`);
-    if (button) {
-      button.addEventListener('click', () => {
-        selectSpread(spread.id);
-        switchPanel('spread-section');
-      });
-    }
-  });
-}
-
-function renderSpreadCard(spread) {
-  const themeClass = spread.theme ? ` spread-card--${spread.theme}` : '';
-  const positionPreview = spread.positions
-    .slice(0, 3)
-    .map((pos) => `<li>${pos.title}</li>`)
-    .join('');
-
-  return `
-    <article class="spread-card${themeClass}">
-      <div class="spread-card__header">
-        <div>
-          <h3 class="spread-card__title">${spread.name}</h3>
-          <div class="spread-card__meta">
-            <span>共 ${spread.cardCount} 張</span>
-          </div>
-        </div>
-        ${
-          spread.highlight
-            ? `<span class="spread-card__tag">${spread.highlight}</span>`
-            : ''
-        }
-      </div>
-      <p>${spread.description}</p>
-      <ul class="spread-card__positions">${positionPreview}</ul>
-      <button class="btn spread-card__action" data-spread-id="${spread.id}">選擇此牌陣</button>
-    </article>
-  `;
 }
 
 function selectSpread(spreadId) {
@@ -1815,10 +1655,20 @@ function resetAll() {
   state.interpretationNotice = '';
   state.interpretationAutoExpand = false;
   resetDeck();
-  ui.questionTextarea.value = '';
-  ui.analysisResult.textContent = '';
-  ui.analysisResult.classList.remove('active');
-  ui.recommendedSpreads.innerHTML = '';
+  if (window.QuestionPage && typeof window.QuestionPage.reset === 'function') {
+    window.QuestionPage.reset();
+  } else {
+    if (ui.questionTextarea) {
+      ui.questionTextarea.value = '';
+    }
+    if (ui.analysisResult) {
+      ui.analysisResult.textContent = '';
+      ui.analysisResult.classList.remove('active');
+    }
+    if (ui.recommendedSpreads) {
+      ui.recommendedSpreads.innerHTML = '';
+    }
+  }
   ui.spreadCaption.textContent = '請先選擇適合的牌陣。';
   ui.spreadDetails.innerHTML = '';
   ui.readingOverview.innerHTML = '';
@@ -1846,4 +1696,23 @@ function setCurrentYear() {
 function formatTimestamp(date) {
   if (!date) return '';
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function getCategoryDisplay() {
+  if (window.QuestionPage && typeof window.QuestionPage.getCategoryDisplay === 'function') {
+    return window.QuestionPage.getCategoryDisplay();
+  }
+  if (!state.categories || !state.categories.length) {
+    return '通用';
+  }
+  const mapping = {
+    love: '感情 / 關係',
+    career: '工作 / 職涯',
+    finance: '財務 / 物質',
+    health: '健康 / 身心',
+    self: '自我成長',
+    study: '學習 / 考試',
+    general: '通用'
+  };
+  return state.categories.map((category) => mapping[category] || category).join('、');
 }
