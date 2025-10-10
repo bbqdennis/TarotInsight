@@ -102,8 +102,19 @@
       if (!this.state) {
         return;
       }
-      this.state.question = '';
-      this.state.categories = [];
+
+      const textarea = this.ui?.questionTextarea;
+      const pendingQuestion = textarea ? textarea.value.trim() : '';
+
+      if (pendingQuestion) {
+        this.state.question = pendingQuestion;
+        const categories = this.analyzeQuestion(pendingQuestion);
+        this.state.categories = categories.length ? categories : ['general'];
+      } else {
+        this.state.question = '';
+        this.state.categories = [];
+      }
+
       this.state.timestamp = new Date();
       this.state.showAllSpreads = true;
 
