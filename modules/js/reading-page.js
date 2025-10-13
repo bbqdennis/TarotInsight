@@ -404,13 +404,24 @@
   }
 
   function buildDetailText(position, card) {
-    const base = `${position.title}代表${position.meaning}`;
-    const detail = card.detail;
-    const questionRef = appState.question
-      ? `結合你的提問「${appState.question}」，此牌提醒：${card.insight}`
-      : card.insight;
+    const language = window.i18n?.getLanguage ? window.i18n.getLanguage() : 'chinese';
+    const positionTitle = localize(position.title, position.title);
+    const positionMeaning = localize(position.meaning, position.meaning);
+    const cardDetail = card.detail || '';
+    const cardInsight = card.insight || '';
 
-    return `${base}。${detail} ${questionRef}`;
+    if (language === 'english') {
+      const questionLine = appState.question
+        ? `Connecting with your question, “${appState.question}”, this card reminds you that ${cardInsight}`
+        : cardInsight;
+      return `${positionTitle} represents ${positionMeaning}. ${cardDetail} ${questionLine}`.trim();
+    }
+
+    const questionRef = appState.question
+      ? `結合你的提問「${appState.question}」，此牌提醒：${cardInsight}`
+      : cardInsight;
+
+    return `${positionTitle}代表${positionMeaning}。${cardDetail} ${questionRef}`.trim();
   }
 
   window.ReadingPage = ReadingPage;
