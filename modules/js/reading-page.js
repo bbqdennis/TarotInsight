@@ -365,7 +365,7 @@
         },
         body: JSON.stringify({
           question: questionPayload,
-          language
+          language: language
         }),
         signal: controller.signal
       });
