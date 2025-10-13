@@ -14,7 +14,7 @@ const state = {
   interpretationAutoExpand: false,
   interpretationNoticeKey: '',
   interpretationNoticeReplacements: null,
-  language: 'chinese'
+  language: 'english'
 };
 
 const ui = {};
