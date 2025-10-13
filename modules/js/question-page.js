@@ -332,6 +332,12 @@
         return;
       }
 
+      if (!this.state.question && !this.state.showAllSpreads) {
+        this.state.recommendedSpreads = [];
+        this.ui.recommendedSpreads.innerHTML = '';
+        return;
+      }
+
       const themeOrder = themePriority.reduce((acc, theme, index) => {
         acc[theme] = index;
         return acc;
