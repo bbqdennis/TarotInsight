@@ -1,0 +1,376 @@
+[
+  {
+    "id": "major-0",
+    "name": "愚者（The Fool）",
+    "arcana": "major",
+    "keywords": [
+      "新旅程",
+      "信任",
+      "自由"
+    ],
+    "upright": "擁抱未知，勇敢踏出第一步，信任直覺帶來新冒險。",
+    "reversed": "腳步過快或準備不足，提醒你評估風險與落地計畫。",
+    "detail": "愚者象徵靈魂的起點，邀請你以開放姿態面對未知。",
+    "insights": {
+      "upright": "保持好奇與靈活，允許自己犯錯並從經驗中調整。",
+      "reversed": "在行動前先確認安全網，或回頭檢視核心動機。"
+    }
+  },
+  {
+    "id": "major-1",
+    "name": "魔術師（The Magician）",
+    "arcana": "major",
+    "keywords": [
+      "顯化",
+      "行動力",
+      "資源整合"
+    ],
+    "upright": "將想法化為具體行動，運用手邊資源創造理想。",
+    "reversed": "能量分散或技巧未臻成熟，需要專注與誠實溝通。",
+    "detail": "魔術師連結天地資源，提醒你善用天賦與工具。",
+    "insights": {
+      "upright": "聚焦在單一優先事項，你的技巧能引導他人。",
+      "reversed": "避免操控或吹噓，先修煉內在意圖與專業。"
+    }
+  },
+  {
+    "id": "major-2",
+    "name": "女祭司（The High Priestess）",
+    "arcana": "major",
+    "keywords": [
+      "直覺",
+      "內在智慧",
+      "靜心"
+    ],
+    "upright": "傾聽內在聲音，保持觀察者視角，等待訊息浮現。",
+    "reversed": "壓抑直覺或資訊不足，提醒你坦誠面對感受。",
+    "detail": "女祭司守護潛意識的秘境，邀你信任靈魂的指引。",
+    "insights": {
+      "upright": "透過冥想、寫作或夢境紀錄深化覺知。",
+      "reversed": "釋放懷疑與恐懼，尋求值得信賴的心靈支持。"
+    }
+  },
+  {
+    "id": "major-3",
+    "name": "女皇（The Empress）",
+    "arcana": "major",
+    "keywords": [
+      "滋養",
+      "豐盛",
+      "創造"
+    ],
+    "upright": "擁抱感官與情感，透過照顧自己孕育新的成果。",
+    "reversed": "過度給予或忽略自身需求，需要重視界線與自我價值。",
+    "detail": "女皇象徵母性的滋養能量與創造力。",
+    "insights": {
+      "upright": "向愛的人表達感謝，同時邀請支持。",
+      "reversed": "停下無止盡的付出，優先回到身心平衡。"
+    }
+  },
+  {
+    "id": "major-4",
+    "name": "皇帝（The Emperor）",
+    "arcana": "major",
+    "keywords": [
+      "結構",
+      "領導",
+      "責任"
+    ],
+    "upright": "建立穩定的框架與規劃，透過紀律驅動成果。",
+    "reversed": "控制過度或權威失衡，重新檢視權力運用方式。",
+    "detail": "皇帝代表保護、秩序與長期策略。",
+    "insights": {
+      "upright": "訂定明確規則並以行動帶頭示範。",
+      "reversed": "鬆開僵化掌控，允許彈性與合作。"
+    }
+  },
+  {
+    "id": "major-5",
+    "name": "教皇（The Hierophant）",
+    "arcana": "major",
+    "keywords": [
+      "傳統",
+      "學習",
+      "指導"
+    ],
+    "upright": "遵循有效制度與師長指引，扎根於共同信念。",
+    "reversed": "被舊規綁住或缺乏個人觀點，尋找內在真理。",
+    "detail": "教皇傳遞智慧，連結社群與儀式的力量。",
+    "insights": {
+      "upright": "向可信賴的導師求教，深化專業。",
+      "reversed": "勇於質疑傳統，定義屬於你的規範。"
+    }
+  },
+  {
+    "id": "major-6",
+    "name": "戀人（The Lovers）",
+    "arcana": "major",
+    "keywords": [
+      "選擇",
+      "價值觀",
+      "關係"
+    ],
+    "upright": "透過誠實交流對齊價值觀，做出真實的選擇。",
+    "reversed": "價值衝突或迷失自我，需要重新確認界線與渴望。",
+    "detail": "戀人象徵契合與真實選擇的考驗。",
+    "insights": {
+      "upright": "開放心胸分享想法，挑選與靈魂共鳴的路。",
+      "reversed": "暫停外界聲音，先回到自我承諾。"
+    }
+  },
+  {
+    "id": "major-7",
+    "name": "戰車（The Chariot）",
+    "arcana": "major",
+    "keywords": [
+      "行動",
+      "決心",
+      "勝利"
+    ],
+    "upright": "集中意志力，穩住方向，勇敢推進。",
+    "reversed": "方向搖擺或能量分裂，先調和內在衝突。",
+    "detail": "戰車象徵掌舵與勝利，需要心智與情感一致。",
+    "insights": {
+      "upright": "設定明確里程碑，保持自律。",
+      "reversed": "回到核心目標，整合散亂的心力。"
+    }
+  },
+  {
+    "id": "major-8",
+    "name": "力量（Strength）",
+    "arcana": "major",
+    "keywords": [
+      "溫柔勇氣",
+      "自我掌握",
+      "信任"
+    ],
+    "upright": "以溫柔與耐心掌握內在野性，展現深層力量。",
+    "reversed": "自信不足或壓抑情緒，學習接納脆弱。",
+    "detail": "力量牌提醒你，真正的勇氣來自慈悲。",
+    "insights": {
+      "upright": "透過持續練習與自我鼓勵強化信心。",
+      "reversed": "向值得信任的人求助，慢慢重建力量。"
+    }
+  },
+  {
+    "id": "major-9",
+    "name": "隱者（The Hermit）",
+    "arcana": "major",
+    "keywords": [
+      "內省",
+      "智慧",
+      "獨處"
+    ],
+    "upright": "抽離喧囂，透過獨處整理洞察與方向。",
+    "reversed": "過度孤立或逃避現實，適時分享內心感受。",
+    "detail": "隱者提燈照亮前方，象徵自我探問的旅程。",
+    "insights": {
+      "upright": "安排靜心或閱讀時間，深化專注。",
+      "reversed": "建立互信圈，讓人了解你的需求。"
+    }
+  },
+  {
+    "id": "major-10",
+    "name": "命運之輪（Wheel of Fortune）",
+    "arcana": "major",
+    "keywords": [
+      "變動",
+      "循環",
+      "機運"
+    ],
+    "upright": "時機正在轉動，敞開心胸迎接新的節奏與機遇。",
+    "reversed": "暫時的停滯或反覆，提醒調整節奏與態度。",
+    "detail": "命運之輪象徵生命循環與共同命運。",
+    "insights": {
+      "upright": "順應波動，抓住轉機提供的線索。",
+      "reversed": "面對反覆情勢，檢視你能掌握的部分。"
+    }
+  },
+  {
+    "id": "major-11",
+    "name": "正義（Justice）",
+    "arcana": "major",
+    "keywords": [
+      "公平",
+      "決策",
+      "真相"
+    ],
+    "upright": "平衡利益與責任，做出符合價值的判斷。",
+    "reversed": "資訊失衡或自我責備，重新蒐集事實。",
+    "detail": "正義牌提醒你保持誠實與均衡。",
+    "insights": {
+      "upright": "清楚列出利弊，對結果負責。",
+      "reversed": "別急著定罪，給自己與他人第二次機會。"
+    }
+  },
+  {
+    "id": "major-12",
+    "name": "吊人（The Hanged Man）",
+    "arcana": "major",
+    "keywords": [
+      "視角轉換",
+      "臣服",
+      "暫停"
+    ],
+    "upright": "暫停腳步，用全新角度理解事件。",
+    "reversed": "拖延或抗拒放手，反思你緊抓不放的原因。",
+    "detail": "吊人代表自願的停留，以換取更高層次的覺察。",
+    "insights": {
+      "upright": "允許過程發酵，新的答案會浮現。",
+      "reversed": "找出恐懼背後的需求，再決定是否放手。"
+    }
+  },
+  {
+    "id": "major-13",
+    "name": "死神（Death）",
+    "arcana": "major",
+    "keywords": [
+      "結束",
+      "轉化",
+      "重生"
+    ],
+    "upright": "某段旅程即將結束，騰出空間迎接新生命。",
+    "reversed": "害怕改變或停留在過往，溫柔地告別舊模式。",
+    "detail": "死神象徵蛻變，提醒你接受不可逆的變化。",
+    "insights": {
+      "upright": "透過儀式向過去致意，再向前邁進。",
+      "reversed": "逐步放下，為自己安排緩衝期。"
+    }
+  },
+  {
+    "id": "major-14",
+    "name": "節制（Temperance）",
+    "arcana": "major",
+    "keywords": [
+      "調和",
+      "節奏",
+      "整合"
+    ],
+    "upright": "保持彈性與耐心，讓不同元素取得平衡。",
+    "reversed": "節奏失衡或躁動，回到適度的步調。",
+    "detail": "節制天使混和兩杯水，象徵協調與療癒。",
+    "insights": {
+      "upright": "設定循序漸進的計畫，整合資源。",
+      "reversed": "不要急於一次完成，一次調整一件事。"
+    }
+  },
+  {
+    "id": "major-15",
+    "name": "惡魔（The Devil）",
+    "arcana": "major",
+    "keywords": [
+      "束縛",
+      "慾望",
+      "影子"
+    ],
+    "upright": "面對被欲望牽制的部分，理解其背後需求。",
+    "reversed": "覺醒於束縛，準備鬆開過度依賴。",
+    "detail": "惡魔彰顯影子自我與被束縛的恐懼。",
+    "insights": {
+      "upright": "誠實檢視上癮或權力失衡的模式。",
+      "reversed": "尋求協助，逐步重獲自主。"
+    }
+  },
+  {
+    "id": "major-16",
+    "name": "高塔（The Tower）",
+    "arcana": "major",
+    "keywords": [
+      "突變",
+      "覺醒",
+      "解構"
+    ],
+    "upright": "突如其來的轉變拆除舊有結構，讓真相浮現。",
+    "reversed": "延遲的崩解或害怕動盪，主動清理不穩基礎。",
+    "detail": "高塔被閃電擊中，象徵迅速而徹底的覺醒。",
+    "insights": {
+      "upright": "在混亂中尋找真實可依靠的核心。",
+      "reversed": "預先調整，降低衝擊的破壞力。"
+    }
+  },
+  {
+    "id": "major-17",
+    "name": "星星（The Star）",
+    "arcana": "major",
+    "keywords": [
+      "希望",
+      "療癒",
+      "靈感"
+    ],
+    "upright": "重燃希望，信任宇宙正在回應你的祈願。",
+    "reversed": "信心受挫或能量分散，調整期待與界線。",
+    "detail": "星星帶來溫柔的光，提醒你保持信任與分享。",
+    "insights": {
+      "upright": "透過創作與分享，讓靈感流動。",
+      "reversed": "補充能量，明確界定你能給予的範圍。"
+    }
+  },
+  {
+    "id": "major-18",
+    "name": "月亮（The Moon）",
+    "arcana": "major",
+    "keywords": [
+      "潛意識",
+      "直覺",
+      "幻象"
+    ],
+    "upright": "情緒起伏提醒你辨識真實與投射。",
+    "reversed": "面對長期的焦慮或迷霧，尋找具體支持。",
+    "detail": "月亮照亮夜色，也投射陰影，象徵未知。",
+    "insights": {
+      "upright": "透過創作或記夢探索內心。",
+      "reversed": "建立日常儀式，安定敏感的感官。"
+    }
+  },
+  {
+    "id": "major-19",
+    "name": "太陽（The Sun）",
+    "arcana": "major",
+    "keywords": [
+      "喜悅",
+      "成功",
+      "活力"
+    ],
+    "upright": "敞開心胸分享成果，享受成功與清晰。",
+    "reversed": "暫時的失落或能量不足，調整自我期待。",
+    "detail": "太陽象徵光明與孩童般的純真。",
+    "insights": {
+      "upright": "讓你的熱情感染團隊，共創成果。",
+      "reversed": "給自己休息與玩樂，重新充電。"
+    }
+  },
+  {
+    "id": "major-20",
+    "name": "審判（Judgement）",
+    "arcana": "major",
+    "keywords": [
+      "覺醒",
+      "召喚",
+      "總結"
+    ],
+    "upright": "正站在關鍵門檻，根據靈魂召喚做決定。",
+    "reversed": "誤聽外界評價或遲疑，整合過去經驗再前進。",
+    "detail": "審判號角召喚重生，提醒你回答內在召喚。",
+    "insights": {
+      "upright": "整理成果並宣示下一階段目標。",
+      "reversed": "停止自我批判，允許自己再嘗試。"
+    }
+  },
+  {
+    "id": "major-21",
+    "name": "世界（The World）",
+    "arcana": "major",
+    "keywords": [
+      "完成",
+      "整合",
+      "旅程"
+    ],
+    "upright": "重要循環即將完成，進入全新的視野與舞台。",
+    "reversed": "尚有未竟之事或遲遲不敢結束，補齊最後拼圖。",
+    "detail": "世界象徵整體與圓滿，也預示新的周期。",
+    "insights": {
+      "upright": "慶祝你的成就，準備迎接新旅程。",
+      "reversed": "確認是否尚有遺留細節需收尾。"
+    }
+  }
+]

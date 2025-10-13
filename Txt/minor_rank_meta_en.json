@@ -1,0 +1,212 @@
+{
+  "2": {
+    "display": " Two",
+    "english": "Two",
+    "keywords": [
+      "Choice",
+      "Balance"
+    ],
+    "upright": "Two paths unfold, asking you to harmonise priorities.",
+    "reversed": "Indecision or imbalance calls for clear priorities.",
+    "detail": "Twos emphasise duality, interaction, and deliberate selection.",
+    "insights": {
+      "upright": "Integrate the information before moving - clarity is close.",
+      "reversed": "Release excessive worry and choose what aligns with your heart."
+    }
+  },
+  "3": {
+    "display": " Three",
+    "english": "Three",
+    "keywords": [
+      "Expansion",
+      "Collaboration"
+    ],
+    "upright": "Teamwork and planning take shape, entering an expansive phase.",
+    "reversed": "Coordination falters or resources thin; refine your strategy.",
+    "detail": "Threes symbolise cooperation and early progress.",
+    "insights": {
+      "upright": "Invite allies to co-create a shared long-term vision.",
+      "reversed": "Revisit roles and fill the gaps that limit growth."
+    }
+  },
+  "4": {
+    "display": " Four",
+    "english": "Four",
+    "keywords": [
+      "Stability",
+      "Structure"
+    ],
+    "upright": "Foundations solidify, helping results settle and mature.",
+    "reversed": "Rigidity or stagnation appears - introduce flexibility.",
+    "detail": "Fours bring order, security, and containment.",
+    "insights": {
+      "upright": "Sustain efficiency through systems and clear routines.",
+      "reversed": "Reintroduce play and openness to keep life dynamic."
+    }
+  },
+  "5": {
+    "display": " Five",
+    "english": "Five",
+    "keywords": [
+      "Challenge",
+      "Change"
+    ],
+    "upright": "Conflict or disruption tests your adaptability and courage.",
+    "reversed": "Tension eases or needless struggle should be released.",
+    "detail": "Fives highlight friction and the need to evolve strategies.",
+    "insights": {
+      "upright": "Keep communication open and seek collaborative solutions.",
+      "reversed": "Exit draining battles and focus on what truly matters."
+    }
+  },
+  "6": {
+    "display": " Six",
+    "english": "Six",
+    "keywords": [
+      "Flow",
+      "Support"
+    ],
+    "upright": "Energy regains flow; generosity and exchange return.",
+    "reversed": "Resources feel uneven or overextended; redistribute wisely.",
+    "detail": "Sixes represent restoration, generosity, and reciprocity.",
+    "insights": {
+      "upright": "Share abundance and welcome assistance with gratitude.",
+      "reversed": "Notice where giving drains you and reset healthier agreements."
+    }
+  },
+  "7": {
+    "display": " Seven",
+    "english": "Seven",
+    "keywords": [
+      "Reflection",
+      "Assessment"
+    ],
+    "upright": "Pause and evaluate; patience now strengthens future results.",
+    "reversed": "A lack of payoff or restlessness urges a new approach.",
+    "detail": "Sevens invite introspection and deeper recalibration.",
+    "insights": {
+      "upright": "Review long-term goals and commit to steady refinements.",
+      "reversed": "Adjust tactics or timelines to regain motivation."
+    }
+  },
+  "8": {
+    "display": " Eight",
+    "english": "Eight",
+    "keywords": [
+      "Momentum",
+      "Focus"
+    ],
+    "upright": "Events accelerate, rewarding clear direction and precision.",
+    "reversed": "Distractions or delays slow the pace - realign your focus.",
+    "detail": "Eights emphasise movement, mastery, and disciplined action.",
+    "insights": {
+      "upright": "Channel your attention into purposeful, consistent steps.",
+      "reversed": "Prioritise and clear old tasks before adding more."
+    }
+  },
+  "9": {
+    "display": " Nine",
+    "english": "Nine",
+    "keywords": [
+      "Culmination",
+      "Resilience"
+    ],
+    "upright": "The finish line nears; endurance helps you complete the journey.",
+    "reversed": "Weariness or doubt surfaces - rest and regain perspective.",
+    "detail": "Nines signal attainment and the final stretch before closure.",
+    "insights": {
+      "upright": "Acknowledge progress and conserve energy for the last push.",
+      "reversed": "Lighten the load and seek comfort before proceeding."
+    }
+  },
+  "10": {
+    "display": " Ten",
+    "english": "Ten",
+    "keywords": [
+      "Completion",
+      "Transition"
+    ],
+    "upright": "A cycle culminates, revealing a path into the next chapter.",
+    "reversed": "Overextension or unfinished business needs mindful resolution.",
+    "detail": "Tens mark full-circle completion and the threshold of renewal.",
+    "insights": {
+      "upright": "Celebrate closure and integrate what you have learned.",
+      "reversed": "Tie up loose ends so you can move forward unencumbered."
+    }
+  },
+  "ace": {
+    "display": " Ace",
+    "english": "Ace",
+    "keywords": [
+      "New start",
+      "Potential"
+    ],
+    "upright": "A fresh spark is emerging, full of possibility and inspiration.",
+    "reversed": "Momentum pauses or lacks a clear ignition point - recalibrate before acting.",
+    "detail": "The Ace signals the very beginning of a brand-new cycle.",
+    "insights": {
+      "upright": "Experiment freely and give the idea room to grow.",
+      "reversed": "Identify what blocks the new beginning and adjust your pace."
+    }
+  },
+  "page": {
+    "display": " Page",
+    "english": "Page",
+    "keywords": [
+      "Curiosity",
+      "Messenger"
+    ],
+    "upright": "Fresh enthusiasm fuels learning, exploration, and news.",
+    "reversed": "Inexperience or mixed signals invite clearer communication.",
+    "detail": "Pages embody youthful curiosity and the spark of new understanding.",
+    "insights": {
+      "upright": "Approach situations with openness and a student's mindset.",
+      "reversed": "Clarify intentions and refine skills before you proceed."
+    }
+  },
+  "knight": {
+    "display": " Knight",
+    "english": "Knight",
+    "keywords": [
+      "Movement",
+      "Pursuit"
+    ],
+    "upright": "Purposeful action propels you forward with noticeable momentum.",
+    "reversed": "Impulsivity or aimlessness drains progress - redirect wisely.",
+    "detail": "Knights represent dynamic pursuit and a willingness to engage.",
+    "insights": {
+      "upright": "Commit fully to the course you choose and honour its demands.",
+      "reversed": "Slow down and ensure your mission still aligns with your values."
+    }
+  },
+  "queen": {
+    "display": " Queen",
+    "english": "Queen",
+    "keywords": [
+      "Mastery",
+      "Nurture"
+    ],
+    "upright": "Inner wisdom and compassionate leadership take centre stage.",
+    "reversed": "Emotional overwhelm or withdrawal signals a need for support.",
+    "detail": "Queens personify mature mastery, intuition, and stewardship.",
+    "insights": {
+      "upright": "Lead with empathy and empower others through your example.",
+      "reversed": "Tend to your own needs so you can give from a replenished place."
+    }
+  },
+  "king": {
+    "display": " King",
+    "english": "King",
+    "keywords": [
+      "Authority",
+      "Command"
+    ],
+    "upright": "Confident direction and strategic decisions yield tangible results.",
+    "reversed": "Domineering tendencies or rigid control require recalibration.",
+    "detail": "Kings embody seasoned authority, stewardship, and responsibility.",
+    "insights": {
+      "upright": "Stand firmly in your expertise and guide with clarity.",
+      "reversed": "Share the load, invite counsel, and adapt your approach."
+    }
+  }
+}
