@@ -1,2 +1,2 @@
 DEMO SITE:
-https://tarotmaster.netlify.app
+https://tarot-insight-eta.vercel.app
