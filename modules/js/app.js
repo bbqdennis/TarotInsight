@@ -117,7 +117,7 @@ const UI_TEXT = {
     emailSubject: 'Tarot Insight Reader | My Tarot Report',
     appTitle: 'Tarot Insight Reader',
     appDescription:
-      'From question analysis to spread guidance, drawing, and reporting — a complete tarot journey.',
+      'From question analysis to spread guidance, drawing, and reporting - a complete tarot journey.',
     questionSectionTitle: 'Questions & Spread Suggestions',
     questionSectionDescription:
       'Share your question and we will analyze its theme to suggest the best spreads.',
@@ -128,7 +128,7 @@ const UI_TEXT = {
     spreadSectionTitle: 'Spread Details & Drawing',
     spreadSectionDescription: 'Review the spread information and draw your cards.',
     readingSectionTitle: 'Reading Results',
-    readingSectionDescription: 'See each position’s meaning and insight step by step.',
+    readingSectionDescription: 'See each position\'s meaning and insight step by step.',
     reportSectionTitle: 'Reading Report',
     reportSectionDescription: 'Summarize key messages for saving, sharing, or printing.',
     drawManual: 'Draw Next Card',
@@ -1557,6 +1557,80 @@ const suitMeta = {
   }
 };
 
+const suitMetaTranslationsEN = {
+  wands: {
+    name: 'Wands',
+    keywords: ['Action', 'Inspiration', 'Fire Element'],
+    theme: 'Creativity and momentum',
+    uprightContext: 'the act of igniting passion, pioneering paths, and driving forward',
+    reversedContext: 'impulsiveness, delays, or waning motivation',
+    detail: 'Wands belong to the fire element, symbolising drive, creativity, and leadership.',
+    insights: {
+      upright: 'Follow the spark that excites you and turn ideas into action.',
+      reversed: 'Refocus on what truly matters so your energy is not scattered.'
+    }
+  },
+  cups: {
+    name: 'Cups',
+    keywords: ['Emotion', 'Connection', 'Water Element'],
+    theme: 'Emotional flow and relationships',
+    uprightContext: 'the experience of nourishing feelings, creating resonance, and heartfelt exchange',
+    reversedContext: 'blocked emotions, blurred boundaries, or over-attachment',
+    detail: 'Cups align with the water element, reflecting emotional needs and relationships.',
+    insights: {
+      upright: 'Express feelings and listen openly so emotion can circulate.',
+      reversed: 'Prioritise self-care and clarify what you genuinely need.'
+    }
+  },
+  swords: {
+    name: 'Swords',
+    keywords: ['Thought', 'Decision', 'Air Element'],
+    theme: 'Reason and communication',
+    uprightContext: 'the practice of clarifying thoughts, taking decisive action, and speaking truth',
+    reversedContext: 'overthinking, anxiety, or sharp words that wound',
+    detail: 'Swords represent the air element, symbolising logic, language, and beliefs.',
+    insights: {
+      upright: 'Communicate with precision and stand by what is true.',
+      reversed: 'Soothe the busy mind and pause before reacting impulsively.'
+    }
+  },
+  pentacles: {
+    name: 'Pentacles',
+    keywords: ['Material', 'Practicality', 'Earth Element'],
+    theme: 'Resources and the physical realm',
+    uprightContext: 'the process of grounding, building resources, and executing diligently',
+    reversedContext: 'stagnation, insecurity, or clinging too tightly to results',
+    detail: 'Pentacles belong to the earth element, concerning finances, body, and daily life.',
+    insights: {
+      upright: 'Build steadily and focus on tangible, measurable outcomes.',
+      reversed: 'Review how you allocate value and seek a healthier balance.'
+    }
+  }
+};
+
+const suitMetaEN = Object.fromEntries(
+  Object.entries(suitMeta).map(([key, suit]) => {
+    const translation = suitMetaTranslationsEN[key] || {};
+    const insights = translation.insights || {};
+    return [
+      key,
+      {
+        ...suit,
+        name: translation.name || suit.name,
+        keywords: translation.keywords ? [...translation.keywords] : [...suit.keywords],
+        theme: translation.theme || suit.theme,
+        uprightContext: translation.uprightContext || suit.uprightContext,
+        reversedContext: translation.reversedContext || suit.reversedContext,
+        detail: translation.detail || suit.detail,
+        insights: {
+          upright: insights.upright || suit.insights.upright,
+          reversed: insights.reversed || suit.insights.reversed
+        }
+      }
+    ];
+  })
+);
+
 const minorRankMeta = {
   ace: {
     display: '一',
@@ -1728,6 +1802,193 @@ const minorRankMeta = {
   }
 };
 
+const minorRankMetaTranslationsEN = {
+  ace: {
+    display: ' Ace',
+    keywords: ['New start', 'Potential'],
+    upright: 'A fresh spark is emerging, full of possibility and inspiration.',
+    reversed: 'Momentum pauses or lacks a clear ignition point - recalibrate before acting.',
+    detail: 'The Ace signals the very beginning of a brand-new cycle.',
+    insights: {
+      upright: 'Experiment freely and give the idea room to grow.',
+      reversed: 'Identify what blocks the new beginning and adjust your pace.'
+    }
+  },
+  '2': {
+    display: ' Two',
+    keywords: ['Choice', 'Balance'],
+    upright: 'Two paths unfold, asking you to harmonise priorities.',
+    reversed: 'Indecision or imbalance calls for clear priorities.',
+    detail: 'Twos emphasise duality, interaction, and deliberate selection.',
+    insights: {
+      upright: 'Integrate the information before moving - clarity is close.',
+      reversed: 'Release excessive worry and choose what aligns with your heart.'
+    }
+  },
+  '3': {
+    display: ' Three',
+    keywords: ['Expansion', 'Collaboration'],
+    upright: 'Teamwork and planning take shape, entering an expansive phase.',
+    reversed: 'Coordination falters or resources thin; refine your strategy.',
+    detail: 'Threes symbolise cooperation and early progress.',
+    insights: {
+      upright: 'Invite allies to co-create a shared long-term vision.',
+      reversed: 'Revisit roles and fill the gaps that limit growth.'
+    }
+  },
+  '4': {
+    display: ' Four',
+    keywords: ['Stability', 'Structure'],
+    upright: 'Foundations solidify, helping results settle and mature.',
+    reversed: 'Rigidity or stagnation appears - introduce flexibility.',
+    detail: 'Fours bring order, security, and containment.',
+    insights: {
+      upright: 'Sustain efficiency through systems and clear routines.',
+      reversed: 'Reintroduce play and openness to keep life dynamic.'
+    }
+  },
+  '5': {
+    display: ' Five',
+    keywords: ['Challenge', 'Change'],
+    upright: 'Conflict or disruption tests your adaptability and courage.',
+    reversed: 'Tension eases or needless struggle should be released.',
+    detail: 'Fives highlight friction and the need to evolve strategies.',
+    insights: {
+      upright: 'Keep communication open and seek collaborative solutions.',
+      reversed: 'Exit draining battles and focus on what truly matters.'
+    }
+  },
+  '6': {
+    display: ' Six',
+    keywords: ['Flow', 'Support'],
+    upright: 'Energy regains flow; generosity and exchange return.',
+    reversed: 'Resources feel uneven or overextended; redistribute wisely.',
+    detail: 'Sixes represent restoration, generosity, and reciprocity.',
+    insights: {
+      upright: 'Share abundance and welcome assistance with gratitude.',
+      reversed: 'Notice where giving drains you and reset healthier agreements.'
+    }
+  },
+  '7': {
+    display: ' Seven',
+    keywords: ['Reflection', 'Assessment'],
+    upright: 'Pause and evaluate; patience now strengthens future results.',
+    reversed: 'A lack of payoff or restlessness urges a new approach.',
+    detail: 'Sevens invite introspection and deeper recalibration.',
+    insights: {
+      upright: 'Review long-term goals and commit to steady refinements.',
+      reversed: 'Adjust tactics or timelines to regain motivation.'
+    }
+  },
+  '8': {
+    display: ' Eight',
+    keywords: ['Momentum', 'Focus'],
+    upright: 'Events accelerate, rewarding clear direction and precision.',
+    reversed: 'Distractions or delays slow the pace - realign your focus.',
+    detail: 'Eights emphasise movement, mastery, and disciplined action.',
+    insights: {
+      upright: 'Channel your attention into purposeful, consistent steps.',
+      reversed: 'Prioritise and clear old tasks before adding more.'
+    }
+  },
+  '9': {
+    display: ' Nine',
+    keywords: ['Culmination', 'Resilience'],
+    upright: 'The finish line nears; endurance helps you complete the journey.',
+    reversed: 'Weariness or doubt surfaces - rest and regain perspective.',
+    detail: 'Nines signal attainment and the final stretch before closure.',
+    insights: {
+      upright: 'Acknowledge progress and conserve energy for the last push.',
+      reversed: 'Lighten the load and seek comfort before proceeding.'
+    }
+  },
+  '10': {
+    display: ' Ten',
+    keywords: ['Completion', 'Transition'],
+    upright: 'A cycle culminates, revealing a path into the next chapter.',
+    reversed: 'Overextension or unfinished business needs mindful resolution.',
+    detail: 'Tens mark full-circle completion and the threshold of renewal.',
+    insights: {
+      upright: 'Celebrate closure and integrate what you have learned.',
+      reversed: 'Tie up loose ends so you can move forward unencumbered.'
+    }
+  },
+  page: {
+    display: ' Page',
+    keywords: ['Curiosity', 'Messenger'],
+    upright: 'Fresh enthusiasm fuels learning, exploration, and news.',
+    reversed: 'Inexperience or mixed signals invite clearer communication.',
+    detail: 'Pages embody youthful curiosity and the spark of new understanding.',
+    insights: {
+      upright: "Approach situations with openness and a student's mindset.",
+      reversed: 'Clarify intentions and refine skills before you proceed.'
+    }
+  },
+  knight: {
+    display: ' Knight',
+    keywords: ['Movement', 'Pursuit'],
+    upright: 'Purposeful action propels you forward with noticeable momentum.',
+    reversed: 'Impulsivity or aimlessness drains progress - redirect wisely.',
+    detail: 'Knights represent dynamic pursuit and a willingness to engage.',
+    insights: {
+      upright: 'Commit fully to the course you choose and honour its demands.',
+      reversed: 'Slow down and ensure your mission still aligns with your values.'
+    }
+  },
+  queen: {
+    display: ' Queen',
+    keywords: ['Mastery', 'Nurture'],
+    upright: 'Inner wisdom and compassionate leadership take centre stage.',
+    reversed: 'Emotional overwhelm or withdrawal signals a need for support.',
+    detail: 'Queens personify mature mastery, intuition, and stewardship.',
+    insights: {
+      upright: 'Lead with empathy and empower others through your example.',
+      reversed: 'Tend to your own needs so you can give from a replenished place.'
+    }
+  },
+  king: {
+    display: ' King',
+    keywords: ['Authority', 'Command'],
+    upright: 'Confident direction and strategic decisions yield tangible results.',
+    reversed: 'Domineering tendencies or rigid control require recalibration.',
+    detail: 'Kings embody seasoned authority, stewardship, and responsibility.',
+    insights: {
+      upright: 'Stand firmly in your expertise and guide with clarity.',
+      reversed: 'Share the load, invite counsel, and adapt your approach.'
+    }
+  }
+};
+
+const minorRankMetaEN = Object.fromEntries(
+  Object.entries(minorRankMeta).map(([key, rank]) => {
+    const translation = minorRankMetaTranslationsEN[key] || {};
+    const insights = translation.insights || {};
+    return [
+      key,
+      {
+        ...rank,
+        display: translation.display || rank.display,
+        keywords: translation.keywords ? [...translation.keywords] : [...rank.keywords],
+        upright: translation.upright || rank.upright,
+        reversed: translation.reversed || rank.reversed,
+        detail: translation.detail || rank.detail,
+        insights: {
+          upright: insights.upright || rank.insights.upright,
+          reversed: insights.reversed || rank.insights.reversed
+        }
+      }
+    ];
+  })
+);
+
+function getSuitMetaByLanguage(language) {
+  return language === LANGUAGE_OPTIONS.ENGLISH ? suitMetaEN : suitMeta;
+}
+
+function getMinorRankMetaByLanguage(language) {
+  return language === LANGUAGE_OPTIONS.ENGLISH ? minorRankMetaEN : minorRankMeta;
+}
+
 function generateDeck(language = state.language || LANGUAGE_OPTIONS.CHINESE) {
   const majors = getMajorArcanaByLanguage(language).map((card) => ({
     ...card,
@@ -1735,17 +1996,26 @@ function generateDeck(language = state.language || LANGUAGE_OPTIONS.CHINESE) {
     insights: { ...card.insights }
   }));
   const deck = [...majors];
-  const suits = Object.values(suitMeta);
-  const ranks = Object.keys(minorRankMeta);
+  const suits = Object.values(getSuitMetaByLanguage(language));
+  const rankMeta = getMinorRankMetaByLanguage(language);
+  const ranks = Object.keys(rankMeta);
+  const isEnglish = language === LANGUAGE_OPTIONS.ENGLISH;
 
   suits.forEach((suit) => {
     ranks.forEach((rankKey) => {
-      const rank = minorRankMeta[rankKey];
+      const rank = rankMeta[rankKey];
       const id = `${suit.key}-${rankKey}`;
       const name = `${suit.name}${rank.display}（${rank.english} of ${suit.english}）`;
       const keywords = uniqueKeywords([...suit.keywords, ...rank.keywords]);
-      const upright = `${rank.upright} 這股能量延伸到${suit.theme}，象徵${suit.uprightContext}。`;
-      const reversed = `${rank.reversed} 在${suit.theme}上，顯示${suit.reversedContext}。`;
+      const themeForSentence = isEnglish
+        ? `${suit.theme.charAt(0).toLowerCase()}${suit.theme.slice(1)}`
+        : suit.theme;
+      const upright = isEnglish
+        ? `${rank.upright} This energy extends into ${themeForSentence}, symbolising ${suit.uprightContext}.`
+        : `${rank.upright} 這股能量延伸到${suit.theme}，象徵${suit.uprightContext}。`;
+      const reversed = isEnglish
+        ? `${rank.reversed} Within the realm of ${themeForSentence}, it indicates ${suit.reversedContext}.`
+        : `${rank.reversed} 在${suit.theme}上，顯示${suit.reversedContext}。`;
       const detail = `${rank.detail} ${suit.detail}`.trim();
       const insights = {
         upright: `${rank.insights.upright} ${suit.insights.upright}`.trim(),
