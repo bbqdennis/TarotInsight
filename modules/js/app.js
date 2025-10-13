@@ -430,6 +430,513 @@ const spreadCatalog = [
   }
 ];
 
+const spreadCatalogTranslationsEN = {
+  'daily-oracle': {
+    name: 'Daily Guidance Card',
+    description:
+      'Draw a single card to sense today\'s key energy and reminder; ideal for everyday inspiration.',
+    highlight: 'Daily Reminder',
+    positions: {
+      d1: {
+        label: 'Position 1',
+        title: 'Today\'s Message',
+        meaning: 'The energy, action, or mindset that needs your attention right now.'
+      }
+    }
+  },
+  'three-card': {
+    name: 'Three-Card Insight Spread',
+    description: 'Quickly clarify the past, present, and future; suits most general questions.',
+    highlight: 'Past / Present / Future',
+    positions: {
+      p1: {
+        label: 'Position 1',
+        title: 'Past',
+        meaning: 'The background, causes, and foundational beliefs shaping the situation.'
+      },
+      p2: {
+        label: 'Position 2',
+        title: 'Present',
+        meaning: 'Current manifestations, challenges, and resources you can leverage now.'
+      },
+      p3: {
+        label: 'Position 3',
+        title: 'Future',
+        meaning: 'The direction things may head and the reminder if nothing changes.'
+      }
+    }
+  },
+  'celtic-cross': {
+    name: 'Celtic Cross Spread',
+    description:
+      'Break down the core issue, surrounding influences, and long term trend; ideal for major decisions.',
+    highlight: 'Comprehensive Reading',
+    positions: {
+      c1: {
+        label: 'Position 1',
+        title: 'Current Situation',
+        meaning: 'The core energy and theme you are dealing with right now.'
+      },
+      c2: {
+        label: 'Position 2',
+        title: 'Challenge',
+        meaning: 'Opposing forces, obstacles, or the key lesson in front of you.'
+      },
+      c3: {
+        label: 'Position 3',
+        title: 'Conscious Mind',
+        meaning: 'What you are aware of, aiming for, or actively choosing.'
+      },
+      c4: {
+        label: 'Position 4',
+        title: 'Subconscious',
+        meaning: 'Hidden motives, emotions, and unmet needs beneath the surface.'
+      },
+      c5: {
+        label: 'Position 5',
+        title: 'Past Influence',
+        meaning: 'Events or values from the past that created the current situation.'
+      },
+      c6: {
+        label: 'Position 6',
+        title: 'Near Future',
+        meaning: 'What is emerging soon in terms of actions, opportunities, or shifts.'
+      },
+      c7: {
+        label: 'Position 7',
+        title: 'Self Perspective',
+        meaning: 'How you are approaching the matter, including attitude and capacity.'
+      },
+      c8: {
+        label: 'Position 8',
+        title: 'External Influence',
+        meaning: 'People, environment, or systems that are affecting the situation.'
+      },
+      c9: {
+        label: 'Position 9',
+        title: 'Hopes & Fears',
+        meaning: 'The tug-of-war between what you desire and what you worry about.'
+      },
+      c10: {
+        label: 'Position 10',
+        title: 'Outcome Trend',
+        meaning: 'The potential direction ahead if energies remain the same.'
+      }
+    }
+  },
+  'either-or': {
+    name: 'Either-Or Decision Spread',
+    description:
+      'Compare two options by examining their momentum, gains, and risks to clarify your choice.',
+    highlight: 'Option Comparison',
+    positions: {
+      e1: {
+        label: 'Position 1',
+        title: 'Core Issue',
+        meaning: 'The essence of the situation and what makes this decision important.'
+      },
+      e2: {
+        label: 'Position 2',
+        title: 'Option A Strengths',
+        meaning: 'Main benefits and support offered by option A.'
+      },
+      e3: {
+        label: 'Position 3',
+        title: 'Option A Reminder',
+        meaning: 'Limitations or risks to watch when choosing option A.'
+      },
+      e4: {
+        label: 'Position 4',
+        title: 'Option B Strengths',
+        meaning: 'The possibilities and resources that come with option B.'
+      },
+      e5: {
+        label: 'Position 5',
+        title: 'Option B Reminder',
+        meaning: 'Concerns or costs to consider if you go with option B.'
+      },
+      e6: {
+        label: 'Position 6',
+        title: 'Overall Guidance',
+        meaning: 'The integrated advice that helps you choose the best path.'
+      }
+    }
+  },
+  'triple-choice': {
+    name: 'Triple Choice Strategy Spread',
+    description:
+      'Evaluate three approaches at once by weighing their strengths, challenges, and trajectories.',
+    highlight: 'Multi Option Review',
+    positions: {
+      t1: {
+        label: 'Position 1',
+        title: 'Current Position',
+        meaning: 'Your overall state and core needs right now.'
+      },
+      t2: {
+        label: 'Position 2',
+        title: 'Option One Alignment',
+        meaning: 'How option one supports you and the developments it can bring.'
+      },
+      t3: {
+        label: 'Position 3',
+        title: 'Option One Reminder',
+        meaning: 'Points to pay attention to when implementing option one.'
+      },
+      t4: {
+        label: 'Position 4',
+        title: 'Option Two Alignment',
+        meaning: 'The strengths and supportive energy offered by option two.'
+      },
+      t5: {
+        label: 'Position 5',
+        title: 'Option Two Reminder',
+        meaning: 'Challenges or costs that may surface with option two.'
+      },
+      t6: {
+        label: 'Position 6',
+        title: 'Option Three Alignment',
+        meaning: 'Highlights and opportunities available through option three.'
+      },
+      t7: {
+        label: 'Position 7',
+        title: 'Option Three Reminder',
+        meaning: 'Limitations or trade offs to note when choosing option three.'
+      },
+      t8: {
+        label: 'Position 8',
+        title: 'Overall Guidance',
+        meaning: 'Mindset and actions that support you after comparing all choices.'
+      }
+    }
+  },
+  'persona-insight': {
+    name: 'Persona Insight Spread',
+    description:
+      'Understand someone\'s inner and outer traits, spotting strengths and blind spots for self awareness or relationship insight.',
+    highlight: 'Inner & Outer View',
+    positions: {
+      p1: {
+        label: 'Position 1',
+        title: 'Outer Expression',
+        meaning: 'How others perceive this person and how they tend to act.'
+      },
+      p2: {
+        label: 'Position 2',
+        title: 'Inner Self',
+        meaning: 'Their genuine desires, motivations, and inner drive.'
+      },
+      p3: {
+        label: 'Position 3',
+        title: 'Strengths & Talents',
+        meaning: 'Natural gifts and abilities ready to be expressed.'
+      },
+      p4: {
+        label: 'Position 4',
+        title: 'Potential Challenge',
+        meaning: 'Blind spots, limits, or defense patterns to be aware of.'
+      },
+      p5: {
+        label: 'Position 5',
+        title: 'Soul Lesson',
+        meaning: 'Growth direction calling for integration at this time.'
+      }
+    }
+  },
+  'life-purpose': {
+    name: 'Life Purpose Blueprint Spread',
+    description:
+      'Explore soul goals, potential, and actions to clarify your long term vision during transitions.',
+    highlight: 'Soul Map',
+    positions: {
+      l1: {
+        label: 'Position 1',
+        title: 'Current Identity',
+        meaning: 'The roles and state you are embodying right now.'
+      },
+      l2: {
+        label: 'Position 2',
+        title: 'Soul Calling',
+        meaning: 'The direction and mission your heart truly longs for.'
+      },
+      l3: {
+        label: 'Position 3',
+        title: 'Hidden Talents',
+        meaning: 'Abilities, gifts, and resources waiting to be expressed.'
+      },
+      l4: {
+        label: 'Position 4',
+        title: 'Present Obstacle',
+        meaning: 'Key challenge that blocks your vision at the moment.'
+      },
+      l5: {
+        label: 'Position 5',
+        title: 'Supporting Forces',
+        meaning: 'People, resources, or spiritual allies you can lean on.'
+      },
+      l6: {
+        label: 'Position 6',
+        title: 'Path of Purpose',
+        meaning: 'Core guidance highlighting your next steps and destination.'
+      }
+    }
+  },
+  'year-ahead': {
+    name: 'Year Ahead Forecast Spread',
+    description:
+      'Review the energy and theme of the next twelve months; perfect for new year or birthday intentions.',
+    highlight: '12 Month Insight',
+    positions: {
+      y1: {
+        label: 'Position 1',
+        title: 'January Theme',
+        meaning: 'Focus areas and opportunities appearing in January.'
+      },
+      y2: {
+        label: 'Position 2',
+        title: 'February Theme',
+        meaning: 'What February encourages you to notice and develop.'
+      },
+      y3: {
+        label: 'Position 3',
+        title: 'March Theme',
+        meaning: 'Key energies and trends for the month of March.'
+      },
+      y4: {
+        label: 'Position 4',
+        title: 'April Theme',
+        meaning: 'Guidance for springtime shifts and emerging growth.'
+      },
+      y5: {
+        label: 'Position 5',
+        title: 'May Theme',
+        meaning: 'Opportunities and lessons to embrace in May.'
+      },
+      y6: {
+        label: 'Position 6',
+        title: 'June Theme',
+        meaning: 'Mid year adjustments and how to restore balance.'
+      },
+      y7: {
+        label: 'Position 7',
+        title: 'July Theme',
+        meaning: 'Reminders and key actions for the summer peak.'
+      },
+      y8: {
+        label: 'Position 8',
+        title: 'August Theme',
+        meaning: 'Important trends and harmonising efforts in August.'
+      },
+      y9: {
+        label: 'Position 9',
+        title: 'September Theme',
+        meaning: 'Learning focus and preparations as autumn begins.'
+      },
+      y10: {
+        label: 'Position 10',
+        title: 'October Theme',
+        meaning: 'Changes in relationships, career, or life emerging in October.'
+      },
+      y11: {
+        label: 'Position 11',
+        title: 'November Theme',
+        meaning: 'What needs review and deepening before the year ends.'
+      },
+      y12: {
+        label: 'Position 12',
+        title: 'December Theme',
+        meaning: 'Integration and blessings for closing the year.'
+      },
+      y13: {
+        label: 'Position 13',
+        title: 'Annual Overview',
+        meaning: 'The core lesson and soul growth weaving through the year.'
+      }
+    }
+  },
+  'shadow-work': {
+    name: 'Shadow Work Spread',
+    description:
+      'Gently explore inner shadows and repressed emotions to heal wounds and reclaim power.',
+    highlight: 'Deep Healing',
+    positions: {
+      s1: {
+        label: 'Position 1',
+        title: 'Core Shadow',
+        meaning: 'The part of you that most wants to be seen right now.'
+      },
+      s2: {
+        label: 'Position 2',
+        title: 'Impact Area',
+        meaning: 'How this shadow influences behaviour, relationships, or choices.'
+      },
+      s3: {
+        label: 'Position 3',
+        title: 'Origin',
+        meaning: 'Where the shadow began, such as past events or wounds.'
+      },
+      s4: {
+        label: 'Position 4',
+        title: 'Avoidance Pattern',
+        meaning: 'Strategies you use to escape or suppress these feelings.'
+      },
+      s5: {
+        label: 'Position 5',
+        title: 'Integration Guidance',
+        meaning: 'Actions or practices that help you heal and integrate.'
+      },
+      s6: {
+        label: 'Position 6',
+        title: 'Transformed Power',
+        meaning: 'The strength and new perspective gained after integration.'
+      }
+    }
+  },
+  'relationship-balance': {
+    name: 'Relationship Balance Spread',
+    description:
+      'Focus on both sides of a relationship to understand dynamics, motivations, and future direction.',
+    highlight: 'Two Perspectives',
+    positions: {
+      r1: {
+        label: 'Position 1',
+        title: 'Your State',
+        meaning: 'How you feel and what you expect in this relationship.'
+      },
+      r2: {
+        label: 'Position 2',
+        title: 'Their State',
+        meaning: 'The other person\'s mindset, feelings, and motives.'
+      },
+      r3: {
+        label: 'Position 3',
+        title: 'Relationship Core',
+        meaning: 'The key theme or attraction connecting you both.'
+      },
+      r4: {
+        label: 'Position 4',
+        title: 'How to Harmonise',
+        meaning: 'Actions that foster understanding and cooperation.'
+      },
+      r5: {
+        label: 'Position 5',
+        title: 'Challenge',
+        meaning: 'Friction, blocks, or blind spots to overcome together.'
+      },
+      r6: {
+        label: 'Position 6',
+        title: 'Future Trend',
+        meaning: 'Where the relationship can head once adjustments are made.'
+      }
+    }
+  },
+  'career-path': {
+    name: 'Career Strategy Spread',
+    description:
+      'Assess goals, resources, strategies, and risks to support career planning and decisions.',
+    highlight: 'Career Focus',
+    positions: {
+      k1: {
+        label: 'Position 1',
+        title: 'Vision',
+        meaning: 'The long term direction and value you want to create.'
+      },
+      k2: {
+        label: 'Position 2',
+        title: 'Resources',
+        meaning: 'Personal strengths, networks, or assets you can use.'
+      },
+      k3: {
+        label: 'Position 3',
+        title: 'Challenges',
+        meaning: 'Obstacles, risks, or blind spots to watch closely.'
+      },
+      k4: {
+        label: 'Position 4',
+        title: 'Strategy',
+        meaning: 'Actions and adjustments you can take right now.'
+      },
+      k5: {
+        label: 'Position 5',
+        title: 'Outcome Trend',
+        meaning: 'Potential results if you follow through with the plan.'
+      }
+    }
+  },
+  'self-discovery': {
+    name: 'Self Discovery Healing Spread',
+    description:
+      'Tune into inner needs and healing directions; ideal for personal growth and spiritual inquiry.',
+    highlight: 'Inner Journey',
+    positions: {
+      s1: {
+        label: 'Position 1',
+        title: 'Inner State',
+        meaning: 'The emotions and beliefs that want acknowledgement now.'
+      },
+      s2: {
+        label: 'Position 2',
+        title: 'Lesson',
+        meaning: 'The life theme or pattern you are currently navigating.'
+      },
+      s3: {
+        label: 'Position 3',
+        title: 'Support',
+        meaning: 'Resources, allies, or inspiration that sustain you.'
+      },
+      s4: {
+        label: 'Position 4',
+        title: 'Integration',
+        meaning: 'Next step that brings healing and breakthrough.'
+      }
+    }
+  }
+};
+
+const spreadCatalogEN = spreadCatalog.map((spread) => {
+  const translation = spreadCatalogTranslationsEN[spread.id] || {};
+  const translatedPositions = Array.isArray(spread.positions)
+    ? spread.positions.map((position) => {
+        const positionTranslation =
+          translation.positions && translation.positions[position.id]
+            ? translation.positions[position.id]
+            : {};
+        return {
+          ...position,
+          label: positionTranslation.label || position.label,
+          title: positionTranslation.title || position.title,
+          meaning: positionTranslation.meaning || position.meaning
+        };
+      })
+    : [];
+
+  return {
+    ...spread,
+    name: translation.name || spread.name,
+    description: translation.description || spread.description,
+    highlight: translation.highlight || spread.highlight,
+    positions: translatedPositions
+  };
+});
+
+function getSpreadCatalogByLanguage(language) {
+  return language === LANGUAGE_OPTIONS.ENGLISH ? spreadCatalogEN : spreadCatalog;
+}
+
+function getActiveSpreadCatalog() {
+  return getSpreadCatalogByLanguage(state.language || LANGUAGE_OPTIONS.CHINESE);
+}
+
+function updateSpreadCatalogConsumers() {
+  const activeCatalog = getActiveSpreadCatalog();
+  if (window.QuestionPage && typeof window.QuestionPage.setCatalog === 'function') {
+    window.QuestionPage.setCatalog(activeCatalog);
+  }
+  if (window.SpreadPage && typeof window.SpreadPage.setCatalog === 'function') {
+    window.SpreadPage.setCatalog(activeCatalog);
+  }
+}
+
 const majorArcana = [
   {
     id: 'major-0',
@@ -1004,6 +1511,7 @@ function initializeApp() {
   initializeLanguage();
   attachEventListeners();
   updateSimpleModeToggle();
+  const activeSpreadCatalog = getActiveSpreadCatalog();
   state.deckBlueprint = generateDeck();
   if (window.ReadingPage && typeof window.ReadingPage.init === 'function') {
     window.ReadingPage.init({
@@ -1020,7 +1528,7 @@ function initializeApp() {
     window.SpreadPage.init({
       state,
       ui,
-      spreadCatalog,
+      spreadCatalog: activeSpreadCatalog,
       switchPanel,
       prepareReading:
         window.ReadingPage && typeof window.ReadingPage.prepareReading === 'function'
@@ -1034,7 +1542,7 @@ function initializeApp() {
     window.QuestionPage.init({
       state,
       ui,
-      spreadCatalog,
+      spreadCatalog: activeSpreadCatalog,
       selectSpread:
         window.SpreadPage && typeof window.SpreadPage.selectSpread === 'function'
           ? window.SpreadPage.selectSpread
@@ -1356,6 +1864,7 @@ function applyLanguageToStaticText() {
 function notifyLanguageChange() {
   applyLanguageToStaticText();
   updateSimpleModeToggle();
+  updateSpreadCatalogConsumers();
   if (window.QuestionPage && typeof window.QuestionPage.handleLanguageChange === 'function') {
     window.QuestionPage.handleLanguageChange();
   }

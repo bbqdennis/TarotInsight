@@ -166,9 +166,9 @@
       }
       this.state = state;
       this.ui = ui;
-      this.spreadCatalog = spreadCatalog;
       this.selectSpread = selectSpread;
       this.switchPanel = switchPanel;
+      this.setCatalog(spreadCatalog);
 
       this.boundHandleQuestionSubmit = this.handleQuestionSubmit.bind(this);
       this.boundHandleSkipQuestion = this.handleSkipQuestion.bind(this);
@@ -181,6 +181,31 @@
       }
 
       this.initialized = true;
+    },
+    setCatalog(newCatalog) {
+      if (!Array.isArray(newCatalog)) {
+        return;
+      }
+      this.spreadCatalog = newCatalog;
+      if (this.state) {
+        if (this.state.selectedSpread) {
+          const updatedSelected = newCatalog.find((item) => item.id === this.state.selectedSpread.id);
+          if (updatedSelected) {
+            this.state.selectedSpread = updatedSelected;
+          } else {
+            this.state.selectedSpread = null;
+          }
+        }
+        if (Array.isArray(this.state.recommendedSpreads) && this.state.recommendedSpreads.length) {
+          this.state.recommendedSpreads = this.state.recommendedSpreads
+            .map((spread) => newCatalog.find((item) => item.id === spread.id) || spread)
+            .filter(Boolean);
+        }
+      }
+      if (this.initialized) {
+        this.renderAnalysisSummary();
+        this.renderRecommendedSpreads();
+      }
     },
 
     reset() {

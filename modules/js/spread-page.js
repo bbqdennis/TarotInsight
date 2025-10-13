@@ -98,12 +98,64 @@
       }
       appState = state;
       ui = uiRefs;
-      catalog = spreadCatalog;
       switchPanel = switchPanelFn;
       prepareReading = prepareReadingFn;
+      SpreadPage.setCatalog(spreadCatalog);
       bindEvents();
       SpreadPage.reset();
       initialized = true;
+    },
+
+    setCatalog(newCatalog) {
+      if (!Array.isArray(newCatalog)) {
+        return;
+      }
+      catalog = newCatalog;
+      if (appState?.selectedSpread) {
+        const updatedSpread = catalog.find((item) => item.id === appState.selectedSpread.id);
+        if (updatedSpread) {
+          appState.selectedSpread = updatedSpread;
+          if (Array.isArray(appState.spreadDraws)) {
+            const required = updatedSpread.cardCount;
+            const existing = appState.spreadDraws.slice(0, required);
+            if (existing.length < required) {
+              appState.spreadDraws = [
+                ...existing,
+                ...Array.from({ length: required - existing.length }, () => null)
+              ];
+            } else {
+              appState.spreadDraws = existing;
+            }
+          }
+          renderSpreadDetails();
+          updateOrientationLabels();
+          SpreadPage.updatePositionStatus();
+        } else {
+          appState.selectedSpread = null;
+          appState.spreadDraws = [];
+          if (ui?.spreadDetails) {
+            ui.spreadDetails.innerHTML = '';
+          }
+          if (ui?.spreadCaption) {
+            ui.spreadCaption.textContent = translate('spreadPromptSelect', {
+              fallback: '請先選擇適合的牌陣。'
+            });
+          }
+          if (ui?.toReading) {
+            ui.toReading.disabled = true;
+          }
+          if (ui?.drawManual) {
+            ui.drawManual.disabled = true;
+          }
+          if (ui?.drawAuto) {
+            ui.drawAuto.disabled = true;
+          }
+        }
+      } else if (ui?.spreadCaption) {
+        ui.spreadCaption.textContent = translate('spreadPromptSelect', {
+          fallback: '請先選擇適合的牌陣。'
+        });
+      }
     },
 
     reset() {
