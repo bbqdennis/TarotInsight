@@ -4,6 +4,28 @@
   let apiConfig = {};
   let initialized = false;
 
+  const i18n = window.i18n || null;
+
+  function translate(key, replacements) {
+    if (i18n && typeof i18n.t === 'function') {
+      return i18n.t(key, replacements);
+    }
+    if (replacements && typeof replacements.fallback === 'string') {
+      return replacements.fallback;
+    }
+    return key;
+  }
+
+  function localize(value, fallback = '') {
+    if (i18n && typeof i18n.getText === 'function') {
+      return i18n.getText(value, fallback);
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    return fallback;
+  }
+
   const ReadingPage = {
     init({ state, ui: uiRefs, switchPanel: _switchPanelFn, api = {} }) {
       if (initialized) {
@@ -26,6 +48,8 @@
 
       appState.interpretationNotice = '';
       appState.interpretationAutoExpand = false;
+      appState.interpretationNoticeKey = '';
+      appState.interpretationNoticeReplacements = null;
       renderReadingSummary();
       setLoadingState();
       appState.remoteInterpretations = null;
@@ -44,14 +68,14 @@
         } else {
           appState.remoteInterpretations = null;
           ReadingPage.renderCardInterpretations(null, {
-            message: '暫無線上解牌結果，以下為基本解析。'
+            messageKey: 'remoteEmpty'
           });
         }
       } catch (error) {
         console.error('Failed to fetch tarot insights:', error);
         appState.remoteInterpretations = null;
         ReadingPage.renderCardInterpretations(null, {
-          message: '目前無法連線取得線上解析，以下為基礎解讀。'
+          messageKey: 'remoteUnavailable'
         });
       }
     },
@@ -65,16 +89,67 @@
         remoteResults === undefined ? appState.remoteInterpretations : remoteResults;
       const remoteMap = buildRemoteInterpretationMap(effectiveRemote);
 
-      const autoExpandDetails = Boolean(options.autoExpand);
+      const hasAutoExpand = Object.prototype.hasOwnProperty.call(options, 'autoExpand');
+      const autoExpandDetails = hasAutoExpand
+        ? Boolean(options.autoExpand)
+        : Boolean(appState.interpretationAutoExpand);
       appState.interpretationAutoExpand = autoExpandDetails;
-      appState.interpretationNotice = options.message || '';
+
+      const hasMessageKey = Object.prototype.hasOwnProperty.call(options, 'messageKey');
+      const hasMessage = Object.prototype.hasOwnProperty.call(options, 'message');
+
+      if (hasMessageKey) {
+        const replacements = options.replacements || {};
+        const key = options.messageKey || '';
+        appState.interpretationNoticeKey = key;
+        appState.interpretationNoticeReplacements = Object.keys(replacements).length
+          ? replacements
+          : null;
+        appState.interpretationNotice = key
+          ? translate(key, { ...replacements })
+          : '';
+      } else if (hasMessage) {
+        appState.interpretationNoticeKey = '';
+        appState.interpretationNoticeReplacements = null;
+        appState.interpretationNotice = options.message || '';
+      } else if (appState.interpretationNoticeKey) {
+        const replacements = appState.interpretationNoticeReplacements || {};
+        appState.interpretationNotice = translate(appState.interpretationNoticeKey, {
+          ...replacements
+        });
+      }
+
+      const noticeMessage = appState.interpretationNotice || '';
 
       const cardsHtml = appState.selectedSpread.positions
         .map((pos, index) => {
           const card = appState.spreadDraws[index];
           if (!card) return '';
 
-          const remote = remoteMap.get(pos.title) || remoteMap.get(pos.label);
+          const localizedTitle = localize(pos.title, pos.title);
+          const localizedLabel = localize(pos.label, pos.label);
+          let remote =
+            remoteMap.get(pos.title) ||
+            remoteMap.get(pos.label) ||
+            remoteMap.get(localizedTitle) ||
+            remoteMap.get(localizedLabel);
+          if (!remote) {
+            const lookupKeys = [pos.title, pos.label, localizedTitle, localizedLabel, pos.id]
+              .filter(Boolean)
+              .map((value) => String(value).trim());
+            for (let i = 0; i < lookupKeys.length; i += 1) {
+              const key = lookupKeys[i];
+              if (remoteMap.has(key)) {
+                remote = remoteMap.get(key);
+                break;
+              }
+              const lowerKey = key.toLowerCase();
+              if (remoteMap.has(lowerKey)) {
+                remote = remoteMap.get(lowerKey);
+                break;
+              }
+            }
+          }
           const baseDetail = buildDetailText(pos, card);
           const summaryText = remote?.interpretation
             ? escapeHtml(remote.interpretation)
@@ -97,7 +172,9 @@
           const keywords = card.keywords.map((keyword) => `<span>${escapeHtml(keyword)}</span>`).join('');
           const interpretationId = `interpretation-${pos.id}`;
           const detailsClass = autoExpandDetails ? 'active' : '';
-          const buttonLabel = autoExpandDetails ? '收合詳解' : '查看更多';
+          const buttonLabel = autoExpandDetails
+            ? translate('interpretationToggleCollapse', { fallback: '收合詳解' })
+            : translate('interpretationToggleExpand', { fallback: '查看更多' });
           const imageInnerHtml = appState.simpleMode
             ? ''
             : window.SpreadPage && typeof window.SpreadPage.buildCardImageHtml === 'function'
@@ -110,7 +187,7 @@
           return `
             <article class="card-interpretation" id="${interpretationId}">
               <div class="card-interpretation__header">
-                <h4 class="card-interpretation__title">${escapeHtml(pos.label)} · ${escapeHtml(pos.title)}</h4>
+                <h4 class="card-interpretation__title">${escapeHtml(localizedLabel)} · ${escapeHtml(localizedTitle)}</h4>
                 <span class="chip">${cardDisplay}</span>
               </div>
               ${imageBlock}
@@ -123,8 +200,8 @@
         })
         .join('');
 
-      const messageHtml = options.message
-        ? `<div class="card-interpretation__notice">${escapeHtml(options.message)}</div>`
+      const messageHtml = noticeMessage
+        ? `<div class="card-interpretation__notice">${escapeHtml(noticeMessage)}</div>`
         : '';
       ui.cardInterpretations.innerHTML = `${messageHtml}${cardsHtml}`;
 
@@ -133,10 +210,10 @@
           const details = button.parentElement.querySelector('.card-interpretation__details');
           if (details.classList.contains('active')) {
             details.classList.remove('active');
-            button.textContent = '查看更多';
+            button.textContent = translate('interpretationToggleExpand', { fallback: '查看更多' });
           } else {
             details.classList.add('active');
-            button.textContent = '收合詳解';
+            button.textContent = translate('interpretationToggleCollapse', { fallback: '收合詳解' });
           }
         });
       });
@@ -148,6 +225,8 @@
       }
       appState.interpretationNotice = '';
       appState.interpretationAutoExpand = false;
+      appState.interpretationNoticeKey = '';
+      appState.interpretationNoticeReplacements = null;
       appState.remoteInterpretations = null;
       if (ui?.readingOverview) {
         ui.readingOverview.innerHTML = '';
@@ -159,6 +238,26 @@
 
     getRemoteInterpretationMap(remoteResults) {
       return buildRemoteInterpretationMap(remoteResults);
+    },
+
+    handleLanguageChange() {
+      if (!initialized || !appState) {
+        return;
+      }
+      renderReadingSummary();
+      const options = {};
+      if (appState.interpretationAutoExpand) {
+        options.autoExpand = true;
+      }
+      if (appState.interpretationNoticeKey) {
+        options.messageKey = appState.interpretationNoticeKey;
+        if (appState.interpretationNoticeReplacements) {
+          options.replacements = appState.interpretationNoticeReplacements;
+        }
+      } else if (appState.interpretationNotice) {
+        options.message = appState.interpretationNotice;
+      }
+      ReadingPage.renderCardInterpretations(undefined, options);
     }
   };
 
@@ -169,16 +268,35 @@
 
     const summaryItems = appState.selectedSpread.positions.map((pos, index) => {
       const card = appState.spreadDraws[index];
-      const cardLabel = card ? card.name : '尚未抽牌';
-      return `<div class="chip">${escapeHtml(pos.title)}：${escapeHtml(cardLabel)}</div>`;
+      const title = localize(pos.title, pos.title);
+      const cardLabel = card
+        ? card.name
+        : translate('notYetDrawn', { fallback: '尚未抽牌' });
+      return `<div class="chip">${escapeHtml(title)}：${escapeHtml(cardLabel)}</div>`;
     });
 
-    const questionLine = appState.question ? `<p>提問：「${escapeHtml(appState.question)}」</p>` : '';
+    let questionLine = '';
+    if (appState.question) {
+      const escapedQuestion = escapeHtml(appState.question);
+      const questionText = translate('questionLine', {
+        question: escapedQuestion,
+        fallback: `提問：「${escapedQuestion}」`
+      });
+      questionLine = `<p>${questionText}</p>`;
+    }
+
+    const spreadName = localize(appState.selectedSpread.name, appState.selectedSpread.name);
+    const categoryDisplay = escapeHtml(getCategoryDisplay());
+    const metaText = translate('readingSummaryMeta', {
+      count: appState.selectedSpread.cardCount,
+      category: categoryDisplay,
+      fallback: `共 ${appState.selectedSpread.cardCount} 張牌 · 問題主題：${categoryDisplay}`
+    });
 
     ui.readingOverview.innerHTML = `
       <div class="reading-overview__meta">
-        <h3>${escapeHtml(appState.selectedSpread.name)}</h3>
-        <p>共 ${appState.selectedSpread.cardCount} 張牌 · 問題主題：${escapeHtml(getCategoryDisplay())}</p>
+        <h3>${escapeHtml(spreadName)}</h3>
+        <p>${metaText}</p>
         ${questionLine}
       </div>
       <div class="reading-overview__chips">${summaryItems.join('')}</div>
@@ -189,7 +307,10 @@
     if (!ui?.cardInterpretations) {
       return;
     }
-    ui.cardInterpretations.innerHTML = '<div class="card-interpretation__loading">正在生成解牌內容...</div>';
+    const loadingText = translate('loadingInterpretations', {
+      fallback: '正在生成解牌內容...'
+    });
+    ui.cardInterpretations.innerHTML = `<div class="card-interpretation__loading">${loadingText}</div>`;
   }
 
   function buildQuestionPayload() {
@@ -198,16 +319,28 @@
     }
 
     const lines = [];
-    lines.push(appState.selectedSpread.name);
-    lines.push(`共 ${appState.selectedSpread.cardCount} 張牌 · 問題主題：${getCategoryDisplay()}`);
+    lines.push(localize(appState.selectedSpread.name, appState.selectedSpread.name));
+    lines.push(
+      translate('readingSummaryMeta', {
+        count: appState.selectedSpread.cardCount,
+        category: getCategoryDisplay(),
+        fallback: `共 ${appState.selectedSpread.cardCount} 張牌 · 問題主題：${getCategoryDisplay()}`
+      })
+    );
     if (appState.question) {
-      lines.push(`提問：「${appState.question}」`);
+      lines.push(
+        translate('questionLine', {
+          question: appState.question,
+          fallback: `提問：「${appState.question}」`
+        })
+      );
     }
 
     appState.selectedSpread.positions.forEach((pos, index) => {
       const card = appState.spreadDraws[index];
       if (!card) return;
-      lines.push(`${pos.title}：${card.name} · ${card.orientationLabel}`);
+      const positionTitle = localize(pos.title, pos.title);
+      lines.push(`${positionTitle}：${card.name} · ${card.orientationLabel}`);
     });
 
     return lines.join('\n');
@@ -220,6 +353,7 @@
     const controller = new AbortController();
     const timeoutLimit = typeof apiConfig.timeout === 'number' ? apiConfig.timeout : 60000;
     const timeoutId = setTimeout(() => controller.abort(), timeoutLimit);
+    const language = appState?.language === 'english' ? 'english' : 'chinese';
 
     try {
       const response = await fetch(apiConfig.endpoint, {
@@ -229,7 +363,10 @@
           Accept: 'application/json',
           'n8n-key': 'connect-to-n8n'
         },
-        body: JSON.stringify({ question: questionPayload }),
+        body: JSON.stringify({
+          question: questionPayload,
+          language
+        }),
         signal: controller.signal
       });
 
@@ -255,7 +392,12 @@
     }
     remoteResults.forEach((item) => {
       if (item && item.position) {
-        map.set(item.position, item);
+        const positionKey = String(item.position).trim();
+        map.set(positionKey, item);
+        map.set(positionKey.toLowerCase(), item);
+      }
+      if (item && item.positionId) {
+        map.set(String(item.positionId), item);
       }
     });
     return map;

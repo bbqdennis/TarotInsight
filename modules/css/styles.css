@@ -144,11 +144,28 @@ body {
 .mode-toggle {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
 .mode-toggle .btn {
   min-width: 160px;
+}
+
+.language-toggle {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.language-toggle .btn {
+  min-width: auto;
+  padding: 10px 16px;
+}
+
+.language-toggle .btn.is-active {
+  background: var(--color-primary);
+  color: #fff;
 }
 
 .btn {

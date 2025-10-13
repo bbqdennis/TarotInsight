@@ -63,6 +63,34 @@
   let prepareReading;
   let initialized = false;
 
+  function getOrientationLabel(orientation) {
+    const key = orientation === 'reversed' ? 'orientationReversed' : 'orientationUpright';
+    const fallback = orientation === 'reversed' ? '逆位' : '正位';
+    return translate(key, { fallback });
+  }
+
+  const i18n = window.i18n || null;
+
+  function translate(key, replacements) {
+    if (i18n && typeof i18n.t === 'function') {
+      return i18n.t(key, replacements);
+    }
+    if (replacements && typeof replacements.fallback === 'string') {
+      return replacements.fallback;
+    }
+    return key;
+  }
+
+  function localize(value, fallback = '') {
+    if (i18n && typeof i18n.getText === 'function') {
+      return i18n.getText(value, fallback);
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    return fallback;
+  }
+
   const SpreadPage = {
     init({ state, ui: uiRefs, spreadCatalog, switchPanel: switchPanelFn, prepareReading: prepareReadingFn }) {
       if (initialized) {
@@ -88,8 +116,12 @@
       appState.remoteInterpretations = null;
       appState.interpretationNotice = '';
       appState.interpretationAutoExpand = false;
+      appState.interpretationNoticeKey = '';
+      appState.interpretationNoticeReplacements = null;
       if (ui.spreadCaption) {
-        ui.spreadCaption.textContent = '請先選擇適合的牌陣。';
+        ui.spreadCaption.textContent = translate('spreadPromptSelect', {
+          fallback: '請先選擇適合的牌陣。'
+        });
       }
       if (ui.spreadDetails) {
         ui.spreadDetails.innerHTML = '';
@@ -117,7 +149,11 @@
       appState.selectedSpread = spread;
       SpreadPage.resetSpreadDraw();
       if (ui.spreadCaption) {
-        ui.spreadCaption.textContent = `已選擇：${spread.name}`;
+        const spreadName = localize(spread.name, spread.name);
+        ui.spreadCaption.textContent = translate('spreadSelectedCaption', {
+          spread: spreadName,
+          fallback: `已選擇：${spreadName}`
+        });
       }
       renderSpreadDetails();
     },
@@ -132,6 +168,8 @@
       appState.remoteInterpretations = null;
       appState.interpretationNotice = '';
       appState.interpretationAutoExpand = false;
+      appState.interpretationNoticeKey = '';
+      appState.interpretationNoticeReplacements = null;
       if (ui.drawManual) {
         ui.drawManual.disabled = false;
       }
@@ -209,6 +247,29 @@
       ];
 
       return `<img ${attributes.join(' ')} />`;
+    },
+
+    handleLanguageChange() {
+      if (!initialized) {
+        return;
+      }
+      if (ui?.spreadCaption) {
+        if (appState?.selectedSpread) {
+          const spreadName = localize(appState.selectedSpread.name, appState.selectedSpread.name);
+          ui.spreadCaption.textContent = translate('spreadSelectedCaption', {
+            spread: spreadName,
+            fallback: `已選擇：${spreadName}`
+          });
+        } else {
+          ui.spreadCaption.textContent = translate('spreadPromptSelect', {
+            fallback: '請先選擇適合的牌陣。'
+          });
+        }
+      }
+      updateOrientationLabels();
+      if (appState?.selectedSpread) {
+        renderSpreadDetails();
+      }
     }
   };
 
@@ -250,10 +311,14 @@
       return;
     }
 
+    const spreadName = localize(selectedSpread.name, selectedSpread.name);
+    const spreadDescription = localize(selectedSpread.description, selectedSpread.description);
+    const notDrawnLabel = translate('notYetDrawn', { fallback: '尚未抽牌' });
+
     ui.spreadDetails.innerHTML = `
       <div class="spread-details__header">
-        <h3>${selectedSpread.name}</h3>
-        <p>${selectedSpread.description}</p>
+        <h3>${escapeHtml(spreadName)}</h3>
+        <p>${escapeHtml(spreadDescription)}</p>
       </div>
       <div class="spread-details__positions">
         ${selectedSpread.positions
@@ -261,11 +326,11 @@
             (pos, index) => `
               <div class="spread-position" data-position="${pos.id}">
                 <div class="spread-position__info">
-                  <div class="spread-position__label">${pos.label} · ${pos.title}</div>
-                  <div class="spread-position__meaning">${pos.meaning}</div>
+                  <div class="spread-position__label">${escapeHtml(localize(pos.label, pos.label))} · ${escapeHtml(localize(pos.title, pos.title))}</div>
+                  <div class="spread-position__meaning">${escapeHtml(localize(pos.meaning, pos.meaning))}</div>
                 </div>
                 <div class="spread-position__status" id="position-card-${index}">
-                  尚未抽牌
+                  ${escapeHtml(notDrawnLabel)}
                 </div>
               </div>
             `
@@ -275,7 +340,7 @@
     `;
 
     SpreadPage.updatePositionStatus();
-  }
+}
 
   function resetDeck() {
     if (!appState || !Array.isArray(appState.deckBlueprint)) {
@@ -294,6 +359,17 @@
     appState.remainingDeck = shuffler(blueprintCopy);
   }
 
+  function updateOrientationLabels() {
+    if (!appState || !Array.isArray(appState.spreadDraws)) {
+      return;
+    }
+    appState.spreadDraws.forEach((card) => {
+      if (card && card.orientation) {
+        card.orientationLabel = getOrientationLabel(card.orientation);
+      }
+    });
+  }
+
   function drawCard() {
     if (!appState) {
       return null;
@@ -307,7 +383,7 @@
 
     const baseCard = appState.remainingDeck.pop();
     const orientation = Math.random() > 0.5 ? 'upright' : 'reversed';
-    const orientationLabel = orientation === 'upright' ? '正位' : '逆位';
+    const orientationLabel = getOrientationLabel(orientation);
     const meaning = orientation === 'upright' ? baseCard.upright : baseCard.reversed;
     const insight = orientation === 'upright' ? baseCard.insights.upright : baseCard.insights.reversed;
 
@@ -346,10 +422,13 @@
 
   function buildCardStatusHtml(card, options = {}) {
     if (!card) {
-      return '<span class="card-status__label">尚未抽牌</span>';
+      const label = translate('notYetDrawn', { fallback: '尚未抽牌' });
+      return `<span class="card-status__label">${escapeHtml(label)}</span>`;
     }
 
-    const cardLabel = `${escapeHtml(card.name)} · ${escapeHtml(card.orientationLabel)}`;
+    const orientationLabel = getOrientationLabel(card.orientation);
+    card.orientationLabel = orientationLabel;
+    const cardLabel = `${escapeHtml(card.name)} · ${escapeHtml(orientationLabel)}`;
     if (appState && appState.simpleMode) {
       return `<span class="card-status__label">${cardLabel}</span>`;
     }

@@ -13,23 +13,32 @@
 <body>
   <header class="app-header">
     <div class="app-header__content">
-      <h1>Tarot Insight 解牌師</h1>
-      <p>從提問、牌陣推薦、抽牌到解牌報告，一次完成的塔羅占卜體驗。</p>
+      <h1 id="app-title">Tarot Insight 解牌師</h1>
+      <p id="app-description">從提問、牌陣推薦、抽牌到解牌報告，一次完成的塔羅占卜體驗。</p>
     </div>
   </header>
 
   <main class="app-main">
     <div class="mode-toggle">
+      <div class="language-toggle" role="group" aria-label="Language">
+        <button type="button" class="btn ghost is-active" data-language-option="chinese">中文</button>
+        <button type="button" class="btn ghost" data-language-option="english">English</button>
+      </div>
       <button id="toggle-simple-mode" class="btn ghost" type="button">切換至圖像模式</button>
     </div>
     <section id="question-section" class="panel active">
       <div class="panel__header">
-        <h2>提問與牌陣推薦</h2>
-        <p>輸入你的問題，我們會為你分析主題並推薦最適合的牌陣。</p>
+        <h2 id="question-section-title">提問與牌陣推薦</h2>
+        <p id="question-section-description">輸入你的問題，我們會為你分析主題並推薦最適合的牌陣。</p>
       </div>
       <div class="panel__body">
-        <label for="user-question" class="input-label">你想探索的問題是什麼？</label>
-        <textarea id="user-question" class="input-textarea" rows="4" placeholder="範例：我和伴侶未來的發展如何？"></textarea>
+        <label for="user-question" id="question-label" class="input-label">你想探索的問題是什麼？</label>
+        <textarea
+          id="user-question"
+          class="input-textarea"
+          rows="4"
+          placeholder="範例：我和伴侶未來的發展如何？"
+        ></textarea>
         <div class="actions">
           <button id="submit-question" class="btn primary">送出問題</button>
           <button id="skip-question" class="btn ghost">直接選擇牌陣</button>
@@ -41,7 +50,8 @@
 
     <section id="spread-section" class="panel">
       <div class="panel__header">
-        <h2>牌陣說明與抽牌</h2>
+        <h2 id="spread-section-title">牌陣說明與抽牌</h2>
+        <p id="spread-section-description">請先選擇適合的牌陣。</p>
         <p id="selected-spread-caption">請先選擇適合的牌陣。</p>
       </div>
       <div class="panel__body">
@@ -63,8 +73,8 @@
 
     <section id="reading-section" class="panel">
       <div class="panel__header">
-        <h2>解牌結果</h2>
-        <p>依照牌陣位置逐一呈現每張牌的意義與洞察。</p>
+        <h2 id="reading-section-title">解牌結果</h2>
+        <p id="reading-section-description">依照牌陣位置逐一呈現每張牌的意義與洞察。</p>
       </div>
       <div class="panel__body">
         <div id="reading-overview" class="reading-overview"></div>
@@ -78,8 +88,8 @@
 
     <section id="report-section" class="panel">
       <div class="panel__header">
-        <h2>解牌報告</h2>
-        <p>整理本次占卜的重點，方便儲存、分享或列印。</p>
+        <h2 id="report-section-title">解牌報告</h2>
+        <p id="report-section-description">整理本次占卜的重點，方便儲存、分享或列印。</p>
       </div>
       <div class="panel__body">
         <div id="report-summary" class="report-summary"></div>
@@ -98,7 +108,7 @@
   </main>
 
   <footer class="app-footer">
-    <small>© <span id="current-year"></span> Tarot Insight 解牌師 · 為心之所問提供清晰指引。</small>
+    <small>© <span id="current-year"></span> <span id="footer-note">Tarot Insight 解牌師 · 為心之所問提供清晰指引。</span></small>
   </footer>
 
   <div id="card-lightbox" class="card-lightbox" aria-hidden="true" hidden>

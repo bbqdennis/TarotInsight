@@ -11,10 +11,201 @@ const state = {
   simpleMode: false,
   showAllSpreads: false,
   interpretationNotice: '',
-  interpretationAutoExpand: false
+  interpretationAutoExpand: false,
+  interpretationNoticeKey: '',
+  interpretationNoticeReplacements: null,
+  language: 'chinese'
 };
 
 const ui = {};
+
+const LANGUAGE_OPTIONS = {
+  CHINESE: 'chinese',
+  ENGLISH: 'english'
+};
+
+const UI_TEXT = {
+  chinese: {
+    languageChinese: '中文',
+    languageEnglish: 'English',
+    simpleModeToVisual: '切換至圖像模式',
+    simpleModeToSimple: '切換至簡化模式',
+    cardLightboxClose: '關閉卡牌放大視圖',
+    loadingInterpretations: '正在生成解牌內容...',
+    remoteUnavailable: '目前無法連線取得線上解析，以下為基礎解讀。',
+    remoteEmpty: '暫無線上解牌結果，以下為基本解析。',
+    interpretationToggleExpand: '查看更多',
+    interpretationToggleCollapse: '收合詳解',
+    copySuccess: '報告已複製至剪貼簿！',
+    copyFailure: '複製失敗，請再試一次。',
+    shareTitle: 'Tarot Insight 解牌師 - 占卜重點',
+    shareSite: '主站：https://tarotmaster.netlify.app',
+    shareQuestionLabel: '提問：',
+    shareSpreadLabel: '牌陣：',
+    shareCategoryLabel: '主題：',
+    shareDefault: 'Tarot Insight 解牌師 - 歡迎體驗完整的解牌流程。',
+    spreadPromptSelect: '請先選擇適合的牌陣。',
+    emailSubject: 'Tarot Insight 解牌師｜我的解牌報告',
+    appTitle: 'Tarot Insight 解牌師',
+    appDescription: '從提問、牌陣推薦、抽牌到解牌報告，一次完成的塔羅占卜體驗。',
+    questionSectionTitle: '提問與牌陣推薦',
+    questionSectionDescription: '輸入你的問題，我們會為你分析主題並推薦最適合的牌陣。',
+    questionLabel: '你想探索的問題是什麼？',
+    questionPlaceholder: '範例：我和伴侶未來的發展如何？',
+    submitQuestion: '送出問題',
+    skipQuestion: '直接選擇牌陣',
+    spreadSectionTitle: '牌陣說明與抽牌',
+    spreadSectionDescription: '瀏覽牌陣資訊並開始抽牌。',
+    readingSectionTitle: '解牌結果',
+    readingSectionDescription: '依照牌陣位置逐一呈現每張牌的意義與洞察。',
+    reportSectionTitle: '解牌報告',
+    reportSectionDescription: '整理本次占卜的重點，方便儲存、分享或列印。',
+    drawManual: '抽取下一張牌',
+    drawAuto: '自動抽牌',
+    resetDraw: '重新洗牌',
+    toReading: '前往解牌',
+    backToQuestion: '返回提問',
+    toReport: '生成解牌報告',
+    backToDraw: '返回抽牌',
+    downloadReport: '下載 PDF',
+    copyReport: '複製報告',
+    shareLine: '分享至 LINE',
+    shareEmail: '分享至 Email',
+    backToReading: '返回解牌',
+    startOver: '重新提問',
+    footerNote: 'Tarot Insight 解牌師 · 為心之所問提供清晰指引。',
+    analysisSummary: '問題主題傾向：<strong>{categories}</strong>。已為你挑選最契合的牌陣。',
+    spreadCardCountLabel: '共 {count} 張',
+    chooseSpread: '選擇此牌陣',
+    readingSummaryMeta: '共 {count} 張牌 · 問題主題：{category}',
+    questionLine: '提問：「{question}」',
+    notYetDrawn: '尚未抽牌',
+    orientationUpright: '正位',
+    orientationReversed: '逆位',
+    spreadSelectedCaption: '已選擇：{spread}',
+    reportQuestionLabel: '提問：{question}',
+    reportMetaLine: '時間：{time} · 主題：{category}',
+    reportCopyHeader: 'Tarot Insight 解牌師 - 解牌報告',
+    reportShareHeader: 'Tarot Insight 解牌師 - 占卜重點',
+    reportTimeLabel: '時間：{time}',
+    reportCardLabel: '卡牌：{card}',
+    reportSummaryLabel: '重點：{summary}',
+    reportAdviceLabel: '建議：{advice}',
+    reportCopyButtonSuccess: '已複製',
+    reportCopyButtonFailure: '複製失敗'
+  },
+  english: {
+    languageChinese: '中文',
+    languageEnglish: 'English',
+    simpleModeToVisual: 'Switch to Visual Mode',
+    simpleModeToSimple: 'Switch to Simple Mode',
+    cardLightboxClose: 'Close card lightbox view',
+    loadingInterpretations: 'Generating interpretations...',
+    remoteUnavailable: 'Unable to retrieve online insights right now. Showing base interpretation.',
+    remoteEmpty: 'No online interpretation is available yet. Showing base interpretation.',
+    interpretationToggleExpand: 'View more',
+    interpretationToggleCollapse: 'Collapse details',
+    copySuccess: 'Report copied to clipboard!',
+    copyFailure: 'Copy failed, please try again.',
+    shareTitle: 'Tarot Insight Reader - Key Messages',
+    shareSite: 'Site: https://tarotmaster.netlify.app',
+    shareQuestionLabel: 'Question: ',
+    shareSpreadLabel: 'Spread: ',
+    shareCategoryLabel: 'Theme: ',
+    shareDefault: 'Tarot Insight Reader - Explore the full reading journey.',
+    spreadPromptSelect: 'Please select a spread first.',
+    emailSubject: 'Tarot Insight Reader | My Tarot Report',
+    appTitle: 'Tarot Insight Reader',
+    appDescription:
+      'From question analysis to spread guidance, drawing, and reporting — a complete tarot journey.',
+    questionSectionTitle: 'Questions & Spread Suggestions',
+    questionSectionDescription:
+      'Share your question and we will analyze its theme to suggest the best spreads.',
+    questionLabel: 'What would you like to explore?',
+    questionPlaceholder: 'Example: How will my relationship with my partner develop?',
+    submitQuestion: 'Submit Question',
+    skipQuestion: 'Choose a Spread Directly',
+    spreadSectionTitle: 'Spread Details & Drawing',
+    spreadSectionDescription: 'Review the spread information and draw your cards.',
+    readingSectionTitle: 'Reading Results',
+    readingSectionDescription: 'See each position’s meaning and insight step by step.',
+    reportSectionTitle: 'Reading Report',
+    reportSectionDescription: 'Summarize key messages for saving, sharing, or printing.',
+    drawManual: 'Draw Next Card',
+    drawAuto: 'Draw Automatically',
+    resetDraw: 'Shuffle Again',
+    toReading: 'Go to Interpretation',
+    backToQuestion: 'Back to Questions',
+    toReport: 'Generate Report',
+    backToDraw: 'Back to Drawing',
+    downloadReport: 'Download PDF',
+    copyReport: 'Copy Report',
+    shareLine: 'Share to LINE',
+    shareEmail: 'Share via Email',
+    backToReading: 'Back to Interpretation',
+    startOver: 'Start Over',
+    footerNote: 'Tarot Insight Reader · Guiding your heart with clarity.',
+    analysisSummary: 'Dominant themes: <strong>{categories}</strong>. Here are your best-matched spreads.',
+    spreadCardCountLabel: 'Total {count} cards',
+    chooseSpread: 'Use This Spread',
+    readingSummaryMeta: 'Total {count} cards · Theme: {category}',
+    questionLine: 'Question: “{question}”',
+    notYetDrawn: 'Not drawn yet',
+    orientationUpright: 'Upright',
+    orientationReversed: 'Reversed',
+    spreadSelectedCaption: 'Selected: {spread}',
+    reportQuestionLabel: 'Question: “{question}”',
+    reportMetaLine: 'Time: {time} · Theme: {category}',
+    reportCopyHeader: 'Tarot Insight Reader - Reading Report',
+    reportShareHeader: 'Tarot Insight Reader - Key Highlights',
+    reportTimeLabel: 'Time: {time}',
+    reportCardLabel: 'Card: {card}',
+    reportSummaryLabel: 'Insight: {summary}',
+    reportAdviceLabel: 'Advice: {advice}',
+    reportCopyButtonSuccess: 'Copied',
+    reportCopyButtonFailure: 'Copy failed'
+  }
+};
+
+function translate(key, replacements = {}) {
+  const language = state.language || LANGUAGE_OPTIONS.CHINESE;
+  const template =
+    (UI_TEXT[language] && UI_TEXT[language][key]) ||
+    (UI_TEXT[LANGUAGE_OPTIONS.CHINESE] && UI_TEXT[LANGUAGE_OPTIONS.CHINESE][key]) ||
+    '';
+  return template.replace(/\{(\w+)\}/g, (match, token) => {
+    if (Object.prototype.hasOwnProperty.call(replacements, token)) {
+      return replacements[token];
+    }
+    return match;
+  });
+}
+
+function getLocalizedText(value, defaultValue = '') {
+  if (value == null) {
+    return defaultValue;
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'object') {
+    const language = state.language || LANGUAGE_OPTIONS.CHINESE;
+    if (Object.prototype.hasOwnProperty.call(value, language)) {
+      return value[language];
+    }
+    if (Object.prototype.hasOwnProperty.call(value, LANGUAGE_OPTIONS.CHINESE)) {
+      return value[LANGUAGE_OPTIONS.CHINESE];
+    }
+  }
+  return defaultValue;
+}
+
+window.i18n = {
+  t: (key, replacements = {}) => translate(key, replacements),
+  getLanguage: () => state.language || LANGUAGE_OPTIONS.CHINESE,
+  setLanguage,
+  getText: (value, defaultValue = '') => getLocalizedText(value, defaultValue)
+};
 
 const TAROT_API_ENDPOINT = 'https://n8nautorobot.duckdns.org/webhook/tarot_master';
 const TAROT_API_TIMEOUT = 60000;
@@ -810,6 +1001,7 @@ function shuffle(list) {
 
 function initializeApp() {
   cacheElements();
+  initializeLanguage();
   attachEventListeners();
   updateSimpleModeToggle();
   state.deckBlueprint = generateDeck();
@@ -860,11 +1052,27 @@ function initializeApp() {
     });
   }
   setCurrentYear();
+  notifyLanguageChange();
 }
 
 document.addEventListener('DOMContentLoaded', initializeApp);
 
+function initializeLanguage() {
+  const langAttr = state.language === LANGUAGE_OPTIONS.ENGLISH ? 'en' : 'zh-Hant';
+  document.documentElement.setAttribute('lang', langAttr);
+  updateLanguageControls();
+  applyLanguageToStaticText();
+}
+
 function cacheElements() {
+  ui.appTitle = document.getElementById('app-title');
+  ui.appDescription = document.getElementById('app-description');
+  ui.languageButtons = Array.from(document.querySelectorAll('[data-language-option]'));
+  ui.questionSectionTitle = document.getElementById('question-section-title');
+  ui.questionSectionDescription = document.getElementById('question-section-description');
+  ui.questionLabel = document.querySelector('label[for="user-question"]');
+  ui.spreadSectionTitle = document.getElementById('spread-section-title');
+  ui.spreadSectionDescription = document.getElementById('spread-section-description');
   ui.questionTextarea = document.getElementById('user-question');
   ui.submitQuestion = document.getElementById('submit-question');
   ui.skipQuestion = document.getElementById('skip-question');
@@ -878,17 +1086,27 @@ function cacheElements() {
   ui.drawAuto = document.getElementById('draw-auto');
   ui.resetDraw = document.getElementById('reset-draw');
   ui.toReading = document.getElementById('to-reading');
+  ui.backToQuestionButtons = Array.from(document.querySelectorAll('[data-action="back-to-question"]'));
+  ui.backToDrawButtons = Array.from(document.querySelectorAll('[data-action="back-to-draw"]'));
+  ui.backToReadingButtons = Array.from(document.querySelectorAll('[data-action="back-to-reading"]'));
+  ui.startOverButtons = Array.from(document.querySelectorAll('[data-action="start-over"]'));
   ui.readingOverview = document.getElementById('reading-overview');
   ui.cardInterpretations = document.getElementById('card-interpretations');
   ui.toReport = document.getElementById('to-report');
   ui.reportSummary = document.getElementById('report-summary');
+  ui.readingSectionTitle = document.getElementById('reading-section-title');
+  ui.readingSectionDescription = document.getElementById('reading-section-description');
+  ui.reportSectionTitle = document.getElementById('report-section-title');
+  ui.reportSectionDescription = document.getElementById('report-section-description');
   ui.downloadReport = document.getElementById('download-report');
   ui.copyReport = document.getElementById('copy-report');
   ui.shareLine = document.getElementById('share-line');
   ui.shareEmail = document.getElementById('share-email');
+  ui.footerNote = document.getElementById('footer-note');
   ui.lightbox = document.getElementById('card-lightbox');
   ui.lightboxImage = document.getElementById('card-lightbox-image');
   ui.lightboxCaption = document.getElementById('card-lightbox-caption');
+  ui.lightboxClose = document.querySelector('[data-lightbox-action="close"]');
   ui.currentYear = document.getElementById('current-year');
 }
 
@@ -897,24 +1115,42 @@ function attachEventListeners() {
     ui.toggleSimpleMode.addEventListener('click', toggleSimpleMode);
   }
 
-  ui.shareLine.addEventListener('click', handleShareLine);
-  ui.shareEmail.addEventListener('click', handleShareEmail);
-
-  document.querySelectorAll('[data-action="back-to-question"]').forEach((btn) => {
-    btn.addEventListener('click', () => switchPanel('question-section'));
-  });
-  document.querySelectorAll('[data-action="back-to-draw"]').forEach((btn) => {
-    btn.addEventListener('click', () => switchPanel('spread-section'));
-  });
-  document.querySelectorAll('[data-action="back-to-reading"]').forEach((btn) => {
-    btn.addEventListener('click', () => switchPanel('reading-section'));
-  });
-  document.querySelectorAll('[data-action="start-over"]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      resetAll();
-      switchPanel('question-section');
+  if (ui.languageButtons && ui.languageButtons.length) {
+    ui.languageButtons.forEach((button) => {
+      button.addEventListener('click', handleLanguageSwitch);
     });
-  });
+  }
+
+  if (ui.shareLine) {
+    ui.shareLine.addEventListener('click', handleShareLine);
+  }
+  if (ui.shareEmail) {
+    ui.shareEmail.addEventListener('click', handleShareEmail);
+  }
+
+  if (ui.backToQuestionButtons) {
+    ui.backToQuestionButtons.forEach((btn) => {
+      btn.addEventListener('click', () => switchPanel('question-section'));
+    });
+  }
+  if (ui.backToDrawButtons) {
+    ui.backToDrawButtons.forEach((btn) => {
+      btn.addEventListener('click', () => switchPanel('spread-section'));
+    });
+  }
+  if (ui.backToReadingButtons) {
+    ui.backToReadingButtons.forEach((btn) => {
+      btn.addEventListener('click', () => switchPanel('reading-section'));
+    });
+  }
+  if (ui.startOverButtons) {
+    ui.startOverButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        resetAll();
+        switchPanel('question-section');
+      });
+    });
+  }
 
   document.addEventListener('click', handleDocumentClick);
   document.addEventListener('keydown', handleDocumentKeydown);
@@ -938,7 +1174,12 @@ function toggleSimpleMode() {
   if (state.interpretationAutoExpand) {
     options.autoExpand = true;
   }
-  if (state.interpretationNotice) {
+  if (state.interpretationNoticeKey) {
+    options.messageKey = state.interpretationNoticeKey;
+    if (state.interpretationNoticeReplacements) {
+      options.replacements = state.interpretationNoticeReplacements;
+    }
+  } else if (state.interpretationNotice) {
     options.message = state.interpretationNotice;
   }
   if (window.ReadingPage && typeof window.ReadingPage.renderCardInterpretations === 'function') {
@@ -952,11 +1193,180 @@ function updateSimpleModeToggle() {
   }
 
   if (state.simpleMode) {
-    ui.toggleSimpleMode.textContent = '切換至圖像模式';
+    ui.toggleSimpleMode.textContent = translate('simpleModeToVisual');
     ui.toggleSimpleMode.setAttribute('aria-pressed', 'false');
   } else {
-    ui.toggleSimpleMode.textContent = '切換至簡化模式';
+    ui.toggleSimpleMode.textContent = translate('simpleModeToSimple');
     ui.toggleSimpleMode.setAttribute('aria-pressed', 'true');
+  }
+}
+
+function handleLanguageSwitch(event) {
+  const target = event.currentTarget;
+  if (!target) {
+    return;
+  }
+  const option = target.getAttribute('data-language-option');
+  if (!option) {
+    return;
+  }
+  setLanguage(option);
+}
+
+function setLanguage(language) {
+  if (!language || !Object.values(LANGUAGE_OPTIONS).includes(language)) {
+    return;
+  }
+  if (state.language === language) {
+    return;
+  }
+  state.language = language;
+  document.documentElement.setAttribute('lang', language === LANGUAGE_OPTIONS.ENGLISH ? 'en' : 'zh-Hant');
+  updateLanguageControls();
+  notifyLanguageChange();
+}
+
+function updateLanguageControls() {
+  if (!ui.languageButtons) {
+    return;
+  }
+  ui.languageButtons.forEach((button) => {
+    const option = button.getAttribute('data-language-option');
+    const selected = option === state.language;
+    if (selected) {
+      button.classList.add('is-active');
+    } else {
+      button.classList.remove('is-active');
+    }
+    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+}
+
+function applyLanguageToStaticText() {
+  if (ui.languageButtons && ui.languageButtons.length) {
+    ui.languageButtons.forEach((button) => {
+      const option = button.getAttribute('data-language-option');
+      if (option === LANGUAGE_OPTIONS.CHINESE) {
+        button.textContent = translate('languageChinese');
+      } else if (option === LANGUAGE_OPTIONS.ENGLISH) {
+        button.textContent = translate('languageEnglish');
+      }
+    });
+  }
+  if (ui.appTitle) {
+    ui.appTitle.textContent = translate('appTitle');
+  }
+  if (ui.appDescription) {
+    ui.appDescription.textContent = translate('appDescription');
+  }
+  if (ui.questionSectionTitle) {
+    ui.questionSectionTitle.textContent = translate('questionSectionTitle');
+  }
+  if (ui.questionSectionDescription) {
+    ui.questionSectionDescription.textContent = translate('questionSectionDescription');
+  }
+  if (ui.questionLabel) {
+    ui.questionLabel.textContent = translate('questionLabel');
+  }
+  if (ui.questionTextarea) {
+    ui.questionTextarea.placeholder = translate('questionPlaceholder');
+  }
+  if (ui.submitQuestion) {
+    ui.submitQuestion.textContent = translate('submitQuestion');
+  }
+  if (ui.skipQuestion) {
+    ui.skipQuestion.textContent = translate('skipQuestion');
+  }
+  if (ui.spreadSectionTitle) {
+    ui.spreadSectionTitle.textContent = translate('spreadSectionTitle');
+  }
+  if (ui.spreadSectionDescription) {
+    ui.spreadSectionDescription.textContent = translate('spreadSectionDescription');
+  }
+  if (!state.selectedSpread && ui.spreadCaption) {
+    ui.spreadCaption.textContent = translate('spreadPromptSelect');
+  }
+  if (ui.readingSectionTitle) {
+    ui.readingSectionTitle.textContent = translate('readingSectionTitle');
+  }
+  if (ui.readingSectionDescription) {
+    ui.readingSectionDescription.textContent = translate('readingSectionDescription');
+  }
+  if (ui.reportSectionTitle) {
+    ui.reportSectionTitle.textContent = translate('reportSectionTitle');
+  }
+  if (ui.reportSectionDescription) {
+    ui.reportSectionDescription.textContent = translate('reportSectionDescription');
+  }
+  if (ui.drawManual) {
+    ui.drawManual.textContent = translate('drawManual');
+  }
+  if (ui.drawAuto) {
+    ui.drawAuto.textContent = translate('drawAuto');
+  }
+  if (ui.resetDraw) {
+    ui.resetDraw.textContent = translate('resetDraw');
+  }
+  if (ui.toReading) {
+    ui.toReading.textContent = translate('toReading');
+  }
+  if (ui.backToQuestionButtons && ui.backToQuestionButtons.length) {
+    ui.backToQuestionButtons.forEach((button) => {
+      button.textContent = translate('backToQuestion');
+    });
+  }
+  if (ui.toReport) {
+    ui.toReport.textContent = translate('toReport');
+  }
+  if (ui.backToDrawButtons && ui.backToDrawButtons.length) {
+    ui.backToDrawButtons.forEach((button) => {
+      button.textContent = translate('backToDraw');
+    });
+  }
+  if (ui.downloadReport) {
+    ui.downloadReport.textContent = translate('downloadReport');
+  }
+  if (ui.copyReport) {
+    ui.copyReport.textContent = translate('copyReport');
+  }
+  if (ui.shareLine) {
+    ui.shareLine.textContent = translate('shareLine');
+  }
+  if (ui.shareEmail) {
+    ui.shareEmail.textContent = translate('shareEmail');
+  }
+  if (ui.backToReadingButtons && ui.backToReadingButtons.length) {
+    ui.backToReadingButtons.forEach((button) => {
+      button.textContent = translate('backToReading');
+    });
+  }
+  if (ui.startOverButtons && ui.startOverButtons.length) {
+    ui.startOverButtons.forEach((button) => {
+      button.textContent = translate('startOver');
+    });
+  }
+  if (ui.footerNote) {
+    ui.footerNote.textContent = translate('footerNote');
+  }
+  if (ui.lightboxClose) {
+    ui.lightboxClose.setAttribute('aria-label', translate('cardLightboxClose'));
+  }
+}
+
+function notifyLanguageChange() {
+  applyLanguageToStaticText();
+  updateSimpleModeToggle();
+  if (window.QuestionPage && typeof window.QuestionPage.handleLanguageChange === 'function') {
+    window.QuestionPage.handleLanguageChange();
+  }
+  if (window.SpreadPage && typeof window.SpreadPage.handleLanguageChange === 'function') {
+    window.SpreadPage.handleLanguageChange();
+  }
+  if (window.ReadingPage && typeof window.ReadingPage.handleLanguageChange === 'function') {
+    window.ReadingPage.handleLanguageChange();
+  }
+  if (window.ReportPage && typeof window.ReportPage.handleLanguageChange === 'function') {
+    window.ReportPage.handleLanguageChange();
   }
 }
 
@@ -1034,7 +1444,7 @@ function handleShareLine() {
 }
 
 function handleShareEmail() {
-  const subject = encodeURIComponent('Tarot Insight 解牌師｜我的解牌報告');
+  const subject = encodeURIComponent(translate('emailSubject'));
   const body = encodeURIComponent(buildShareText());
   window.location.href = `mailto:?subject=${subject}&body=${body}`;
 }
@@ -1082,20 +1492,23 @@ function buildShareText() {
     return window.ReportPage.buildShareText();
   }
   if (!state.selectedSpread) {
-    return 'Tarot Insight 解牌師 - 歡迎體驗完整的解牌流程。';
+    return translate('shareDefault');
   }
   const lines = [];
-  lines.push('Tarot Insight 解牌師 - 占卜重點');
-  lines.push('主站：https://tarotmaster.netlify.app');
+  lines.push(translate('shareTitle'));
+  lines.push(translate('shareSite'));
   if (state.question) {
-    lines.push(`提問：${state.question}`);
+    lines.push(`${translate('shareQuestionLabel')}${state.question}`);
   }
-  lines.push(`牌陣：${state.selectedSpread.name}`);
-  lines.push(`主題：${getCategoryDisplay()}`);
+  const spreadName = getLocalizedText(state.selectedSpread.name, state.selectedSpread.name);
+  lines.push(`${translate('shareSpreadLabel')}${spreadName}`);
+  lines.push(`${translate('shareCategoryLabel')}${getCategoryDisplay()}`);
   state.selectedSpread.positions.forEach((pos, index) => {
     const card = state.spreadDraws[index];
     if (!card) return;
-    lines.push(`${pos.title}｜${card.name}（${card.orientationLabel}）：${card.meaning}`);
+    const positionTitle = getLocalizedText(pos.title, pos.title);
+    const cardName = card.name;
+    lines.push(`${positionTitle}｜${cardName}（${card.orientationLabel}）：${card.meaning}`);
   });
   return lines.join('\n');
 }
@@ -1112,6 +1525,8 @@ function resetAll() {
   state.showAllSpreads = false;
   state.interpretationNotice = '';
   state.interpretationAutoExpand = false;
+  state.interpretationNoticeKey = '';
+  state.interpretationNoticeReplacements = null;
   if (window.QuestionPage && typeof window.QuestionPage.reset === 'function') {
     window.QuestionPage.reset();
   } else {
@@ -1136,7 +1551,7 @@ function resetAll() {
     window.SpreadPage.reset();
   } else {
     if (ui.spreadCaption) {
-      ui.spreadCaption.textContent = '請先選擇適合的牌陣。';
+      ui.spreadCaption.textContent = translate('spreadPromptSelect');
     }
     if (ui.spreadDetails) {
       ui.spreadDetails.innerHTML = '';

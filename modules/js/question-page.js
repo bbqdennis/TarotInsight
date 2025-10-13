@@ -1,22 +1,161 @@
 (function (window) {
+  const i18n = window.i18n || null;
+
+  function translate(key, replacements) {
+    if (i18n && typeof i18n.t === 'function') {
+      return i18n.t(key, replacements);
+    }
+    if (replacements && typeof replacements.fallback === 'string') {
+      return replacements.fallback;
+    }
+    return key;
+  }
+
+  function getLanguage() {
+    if (i18n && typeof i18n.getLanguage === 'function') {
+      return i18n.getLanguage();
+    }
+    return 'chinese';
+  }
+
+  function localize(value, fallback = '') {
+    if (i18n && typeof i18n.getText === 'function') {
+      return i18n.getText(value, fallback);
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    return fallback;
+  }
+
   const categoryKeywords = {
-    love: ['愛情', '感情', '戀人', '伴侶', '婚姻', '關係', '曖昧', '分手', '復合', '感受', '桃花'],
-    career: ['工作', '職涯', '升遷', '職場', '老闆', '同事', '創業', '面試', '事業', '專案'],
-    finance: ['財務', '金錢', '收入', '投資', '理財', '資金', '薪水', '負債', '購屋'],
-    health: ['健康', '身體', '養生', '醫療', '睡眠', '壓力', '飲食'],
-    self: ['自我', '成長', '靈性', '人生', '目標', '方向', '迷惘', '情緒', '療癒', '內在'],
-    study: ['學業', '課業', '考試', '學習', '研究', '留學']
+    love: [
+      '愛情',
+      '感情',
+      '戀人',
+      '伴侶',
+      '婚姻',
+      '關係',
+      '曖昧',
+      '分手',
+      '復合',
+      '感受',
+      '桃花',
+      'love',
+      'relationship',
+      'partner',
+      'romance',
+      'marriage',
+      'couple',
+      'dating'
+    ],
+    career: [
+      '工作',
+      '職涯',
+      '升遷',
+      '職場',
+      '老闆',
+      '同事',
+      '創業',
+      '面試',
+      '事業',
+      '專案',
+      'career',
+      'job',
+      'promotion',
+      'work',
+      'boss',
+      'colleague',
+      'business',
+      'startup',
+      'project'
+    ],
+    finance: [
+      '財務',
+      '金錢',
+      '收入',
+      '投資',
+      '理財',
+      '資金',
+      '薪水',
+      '負債',
+      '購屋',
+      'finance',
+      'money',
+      'income',
+      'investment',
+      'budget',
+      'salary',
+      'wealth',
+      'debt',
+      'house'
+    ],
+    health: [
+      '健康',
+      '身體',
+      '養生',
+      '醫療',
+      '睡眠',
+      '壓力',
+      '飲食',
+      'health',
+      'wellbeing',
+      'well-being',
+      'healing',
+      'medical',
+      'stress',
+      'diet',
+      'wellness'
+    ],
+    self: [
+      '自我',
+      '成長',
+      '靈性',
+      '人生',
+      '目標',
+      '方向',
+      '迷惘',
+      '情緒',
+      '療癒',
+      '內在',
+      'self',
+      'growth',
+      'spiritual',
+      'purpose',
+      'goal',
+      'direction',
+      'emotion',
+      'healing',
+      'inner'
+    ],
+    study: [
+      '學業',
+      '課業',
+      '考試',
+      '學習',
+      '研究',
+      '留學',
+      'study',
+      'exam',
+      'learning',
+      'school',
+      'education',
+      'research',
+      'test'
+    ]
   };
 
   const categoryLabelMap = {
-    love: '感情 / 關係',
-    career: '工作 / 職涯',
-    finance: '財務 / 物質',
-    health: '健康 / 身心',
-    self: '自我成長',
-    study: '學習 / 考試',
-    general: '通用'
+    love: { chinese: '感情 / 關係', english: 'Love / Relationships' },
+    career: { chinese: '工作 / 職涯', english: 'Career / Work' },
+    finance: { chinese: '財務 / 物質', english: 'Finance / Resources' },
+    health: { chinese: '健康 / 身心', english: 'Health / Wellbeing' },
+    self: { chinese: '自我成長', english: 'Self Growth' },
+    study: { chinese: '學習 / 考試', english: 'Study / Exams' },
+    general: { chinese: '通用', english: 'General' }
   };
+
+  const defaultCategoryLabel = { chinese: '通用', english: 'General' };
 
   const themePriority = ['analysis', 'inner', 'relationship', 'direction'];
 
@@ -156,7 +295,11 @@
 
       const categoryLabels = this.getCategoryDisplay();
       this.ui.analysisResult.classList.add('active');
-      this.ui.analysisResult.innerHTML = `問題主題傾向：<strong>${categoryLabels}</strong>。已為你挑選最契合的牌陣。`;
+      const summary = translate('analysisSummary', {
+        categories: categoryLabels,
+        fallback: `問題主題傾向：<strong>${categoryLabels}</strong>。已為你挑選最契合的牌陣。`
+      });
+      this.ui.analysisResult.innerHTML = summary;
     },
 
     renderRecommendedSpreads() {
@@ -216,38 +359,62 @@
 
     renderSpreadCard(spread) {
       const themeClass = spread.theme ? ` spread-card--${spread.theme}` : '';
+      const name = localize(spread.name, spread.name);
+      const description = localize(spread.description, spread.description);
+      const highlightText = spread.highlight ? localize(spread.highlight, spread.highlight) : '';
       const positionPreview = spread.positions
         .slice(0, 3)
-        .map((pos) => `<li>${pos.title}</li>`)
+        .map((pos) => `<li>${localize(pos.title, pos.title)}</li>`)
         .join('');
+      const cardCountLabel = translate('spreadCardCountLabel', {
+        count: spread.cardCount,
+        fallback: `共 ${spread.cardCount} 張`
+      });
+      const actionLabel = translate('chooseSpread', { fallback: '選擇此牌陣' });
 
       return `
         <article class="spread-card${themeClass}">
           <div class="spread-card__header">
             <div>
-              <h3 class="spread-card__title">${spread.name}</h3>
+              <h3 class="spread-card__title">${name}</h3>
               <div class="spread-card__meta">
-                <span>共 ${spread.cardCount} 張</span>
+                <span>${cardCountLabel}</span>
               </div>
             </div>
-            ${spread.highlight ? `<span class="spread-card__tag">${spread.highlight}</span>` : ''}
+            ${highlightText ? `<span class="spread-card__tag">${highlightText}</span>` : ''}
           </div>
-          <p>${spread.description}</p>
+          <p>${description}</p>
           <ul class="spread-card__positions">${positionPreview}</ul>
-          <button class="btn spread-card__action" data-spread-id="${spread.id}">選擇此牌陣</button>
+          <button class="btn spread-card__action" data-spread-id="${spread.id}">${actionLabel}</button>
         </article>
       `;
     },
 
     mapCategoryLabel(category) {
-      return categoryLabelMap[category] || category;
+      const label = categoryLabelMap[category];
+      if (!label) {
+        return category;
+      }
+      const fallbackText =
+        typeof label === 'object' && label.chinese ? label.chinese : typeof label === 'string' ? label : category;
+      return localize(label, fallbackText);
     },
 
     getCategoryDisplay() {
       if (!this.state.categories || !this.state.categories.length) {
-        return '通用';
+        return localize(defaultCategoryLabel, defaultCategoryLabel.chinese);
       }
-      return this.state.categories.map((category) => this.mapCategoryLabel(category)).join('、');
+      const language = getLanguage();
+      const separator = language === 'english' ? ', ' : '、';
+      return this.state.categories.map((category) => this.mapCategoryLabel(category)).join(separator);
+    },
+
+    handleLanguageChange() {
+      if (!this.initialized) {
+        return;
+      }
+      this.renderAnalysisSummary();
+      this.renderRecommendedSpreads();
     }
   };
 
