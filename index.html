@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tarot Insight 解牌師</title>
+  <title>Tarot Insight Reader</title>
   <link rel="stylesheet" href="modules/css/styles.css" />
   <link rel="stylesheet" href="modules/css/question-page.css" />
   <link rel="stylesheet" href="modules/css/spread-page.css" />
@@ -13,35 +13,35 @@
 <body>
   <header class="app-header">
     <div class="app-header__content">
-      <h1 id="app-title">Tarot Insight 解牌師</h1>
-      <p id="app-description">從提問、牌陣推薦、抽牌到解牌報告，一次完成的塔羅占卜體驗。</p>
+      <h1 id="app-title">Tarot Insight Reader</h1>
+      <p id="app-description">From question analysis to spread guidance, drawing, and reporting — a complete tarot journey.</p>
     </div>
   </header>
 
   <main class="app-main">
     <div class="mode-toggle">
       <div class="language-toggle" role="group" aria-label="Language">
-        <button type="button" class="btn ghost is-active" data-language-option="chinese">中文</button>
-        <button type="button" class="btn ghost" data-language-option="english">English</button>
+        <button type="button" class="btn ghost" data-language-option="chinese">中文</button>
+        <button type="button" class="btn ghost is-active" data-language-option="english">English</button>
       </div>
-      <button id="toggle-simple-mode" class="btn ghost" type="button">切換至圖像模式</button>
+      <button id="toggle-simple-mode" class="btn ghost" type="button">Switch to Visual Mode</button>
     </div>
     <section id="question-section" class="panel active">
       <div class="panel__header">
-        <h2 id="question-section-title">提問與牌陣推薦</h2>
-        <p id="question-section-description">輸入你的問題，我們會為你分析主題並推薦最適合的牌陣。</p>
+        <h2 id="question-section-title">Questions & Spread Suggestions</h2>
+        <p id="question-section-description">Share your question and we will analyze its theme to suggest the best spreads.</p>
       </div>
       <div class="panel__body">
-        <label for="user-question" id="question-label" class="input-label">你想探索的問題是什麼？</label>
+        <label for="user-question" id="question-label" class="input-label">What would you like to explore?</label>
         <textarea
           id="user-question"
           class="input-textarea"
           rows="4"
-          placeholder="範例：我和伴侶未來的發展如何？"
+          placeholder="Example: How will my relationship with my partner develop?"
         ></textarea>
         <div class="actions">
-          <button id="submit-question" class="btn primary">送出問題</button>
-          <button id="skip-question" class="btn ghost">直接選擇牌陣</button>
+          <button id="submit-question" class="btn primary">Submit Question</button>
+          <button id="skip-question" class="btn ghost">Choose a Spread Directly</button>
         </div>
         <div id="analysis-result" class="analysis-result" aria-live="polite"></div>
         <div id="recommended-spreads" class="spread-grid"></div>
@@ -50,71 +50,71 @@
 
     <section id="spread-section" class="panel">
       <div class="panel__header">
-        <h2 id="spread-section-title">牌陣說明與抽牌</h2>
-        <p id="spread-section-description">請先選擇適合的牌陣。</p>
-        <p id="selected-spread-caption">請先選擇適合的牌陣。</p>
+        <h2 id="spread-section-title">Spread Details & Drawing</h2>
+        <p id="spread-section-description">Review the spread information and draw your cards.</p>
+        <p id="selected-spread-caption">Please select a spread first.</p>
       </div>
       <div class="panel__body">
         <div id="spread-details" class="spread-details"></div>
         <div class="draw-area">
           <div class="draw-controls">
-            <button id="draw-manual" class="btn primary" disabled>抽取下一張牌</button>
-            <button id="draw-auto" class="btn">自動抽牌</button>
-            <button id="reset-draw" class="btn ghost">重新洗牌</button>
+            <button id="draw-manual" class="btn primary" disabled>Draw Next Card</button>
+            <button id="draw-auto" class="btn">Draw Automatically</button>
+            <button id="reset-draw" class="btn ghost">Shuffle Again</button>
           </div>
           <div class="draw-status"></div>
         </div>
         <div class="panel__footer">
-          <button id="to-reading" class="btn success" disabled>前往解牌</button>
-          <button class="btn ghost" data-action="back-to-question">返回提問</button>
+          <button id="to-reading" class="btn success" disabled>Go to Interpretation</button>
+          <button class="btn ghost" data-action="back-to-question">Back to Questions</button>
         </div>
       </div>
     </section>
 
     <section id="reading-section" class="panel">
       <div class="panel__header">
-        <h2 id="reading-section-title">解牌結果</h2>
-        <p id="reading-section-description">依照牌陣位置逐一呈現每張牌的意義與洞察。</p>
+        <h2 id="reading-section-title">Reading Results</h2>
+        <p id="reading-section-description">See each position’s meaning and insight step by step.</p>
       </div>
       <div class="panel__body">
         <div id="reading-overview" class="reading-overview"></div>
         <div id="card-interpretations" class="card-interpretations"></div>
       </div>
       <div class="panel__footer">
-        <button id="to-report" class="btn success">生成解牌報告</button>
-        <button class="btn ghost" data-action="back-to-draw">返回抽牌</button>
+        <button id="to-report" class="btn success">Generate Report</button>
+        <button class="btn ghost" data-action="back-to-draw">Back to Drawing</button>
       </div>
     </section>
 
     <section id="report-section" class="panel">
       <div class="panel__header">
-        <h2 id="report-section-title">解牌報告</h2>
-        <p id="report-section-description">整理本次占卜的重點，方便儲存、分享或列印。</p>
+        <h2 id="report-section-title">Reading Report</h2>
+        <p id="report-section-description">Summarize the key messages for saving, sharing, or printing.</p>
       </div>
       <div class="panel__body">
         <div id="report-summary" class="report-summary"></div>
         <div class="report-actions">
-          <button id="download-report" class="btn primary">下載 PDF</button>
-          <button id="copy-report" class="btn">複製報告</button>
-          <button id="share-line" class="btn">分享至 LINE</button>
-          <button id="share-email" class="btn">分享至 Email</button>
+          <button id="download-report" class="btn primary">Download PDF</button>
+          <button id="copy-report" class="btn">Copy Report</button>
+          <button id="share-line" class="btn">Share to LINE</button>
+          <button id="share-email" class="btn">Share via Email</button>
         </div>
       </div>
       <div class="panel__footer">
-        <button class="btn ghost" data-action="back-to-reading">返回解牌</button>
-        <button class="btn" data-action="start-over">重新提問</button>
+        <button class="btn ghost" data-action="back-to-reading">Back to Interpretation</button>
+        <button class="btn" data-action="start-over">Start Over</button>
       </div>
     </section>
   </main>
 
   <footer class="app-footer">
-    <small>© <span id="current-year"></span> <span id="footer-note">Tarot Insight 解牌師 · 為心之所問提供清晰指引。</span></small>
+    <small>© <span id="current-year"></span> <span id="footer-note">Tarot Insight Reader · Guiding your heart with clarity.</span></small>
   </footer>
 
   <div id="card-lightbox" class="card-lightbox" aria-hidden="true" hidden>
     <div class="card-lightbox__backdrop" data-lightbox-action="close"></div>
     <figure class="card-lightbox__content">
-      <button type="button" class="card-lightbox__close" data-lightbox-action="close" aria-label="關閉卡牌放大視圖">×</button>
+      <button type="button" class="card-lightbox__close" data-lightbox-action="close" aria-label="Close card lightbox view">×</button>
       <img id="card-lightbox-image" class="card-lightbox__image card-image" alt="" loading="lazy" />
       <figcaption id="card-lightbox-caption" class="card-lightbox__caption"></figcaption>
     </figure>
