@@ -1,4 +1,5 @@
-{
+window.TarotData = window.TarotData || {};
+window.TarotData.uiText = {
   "chinese": {
     "languageChinese": "中文",
     "languageEnglish": "English",
@@ -137,4 +138,4 @@
     "reportCopyButtonSuccess": "Copied",
     "reportCopyButtonFailure": "Copy failed"
   }
-}
+};

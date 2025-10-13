@@ -1,4 +1,5 @@
-{
+window.TarotData = window.TarotData || {};
+window.TarotData.minorRankMetaEn = {
   "2": {
     "display": " Two",
     "english": "Two",
@@ -209,4 +210,4 @@
       "reversed": "Share the load, invite counsel, and adapt your approach."
     }
   }
-}
+};

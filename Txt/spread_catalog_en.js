@@ -1,4 +1,5 @@
-[
+window.TarotData = window.TarotData || {};
+window.TarotData.spreadCatalogEn = [
   {
     "id": "daily-oracle",
     "name": "Daily Guidance Card",
@@ -626,4 +627,4 @@
       }
     ]
   }
-]
+];

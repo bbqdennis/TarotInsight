@@ -1,4 +1,5 @@
-{
+window.TarotData = window.TarotData || {};
+window.TarotData.suitMetaZh = {
   "wands": {
     "key": "wands",
     "name": "權杖",
@@ -71,4 +72,4 @@
       "reversed": "重新檢視價值分配，尋找更平衡的運作模式。"
     }
   }
-}
+};

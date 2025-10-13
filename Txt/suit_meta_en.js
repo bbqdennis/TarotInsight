@@ -1,4 +1,5 @@
-{
+window.TarotData = window.TarotData || {};
+window.TarotData.suitMetaEn = {
   "wands": {
     "key": "wands",
     "name": "Wands",
@@ -71,4 +72,4 @@
       "reversed": "Review how you allocate value and seek a healthier balance."
     }
   }
-}
+};

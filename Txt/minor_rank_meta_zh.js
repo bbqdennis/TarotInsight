@@ -1,4 +1,5 @@
-{
+window.TarotData = window.TarotData || {};
+window.TarotData.minorRankMetaZh = {
   "2": {
     "display": "二",
     "english": "Two",
@@ -209,4 +210,4 @@
       "reversed": "邀請合作，避免權力過度集中。"
     }
   }
-}
+};

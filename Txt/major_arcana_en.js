@@ -1,4 +1,5 @@
-[
+window.TarotData = window.TarotData || {};
+window.TarotData.majorArcanaEn = [
   {
     "id": "major-0",
     "name": "The Fool",
@@ -373,4 +374,4 @@
       "reversed": "Identify what still needs closure and address it with care."
     }
   }
-]
+];

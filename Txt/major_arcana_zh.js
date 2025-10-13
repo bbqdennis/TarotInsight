@@ -1,4 +1,5 @@
-[
+window.TarotData = window.TarotData || {};
+window.TarotData.majorArcanaZh = [
   {
     "id": "major-0",
     "name": "愚者（The Fool）",
@@ -373,4 +374,4 @@
       "reversed": "確認是否尚有遺留細節需收尾。"
     }
   }
-]
+];

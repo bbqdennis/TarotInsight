@@ -1,4 +1,5 @@
-[
+window.TarotData = window.TarotData || {};
+window.TarotData.spreadCatalogZh = [
   {
     "id": "daily-oracle",
     "name": "每日運勢牌",
@@ -626,4 +627,4 @@
       }
     ]
   }
-]
+];
