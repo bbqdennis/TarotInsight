@@ -51,7 +51,12 @@
       appState.interpretationNoticeKey = '';
       appState.interpretationNoticeReplacements = null;
       appState.remoteInterpretations = null;
+      appState.interpretationNoticeReplacements = null;
+      appState.remoteInterpretations = null;
+      appState.remoteInterpretations = null;
       appState.finalReport = null; // Clear previous final report
+      appState.isGeneratingFinalReport = false;
+      appState.finalReportError = null;
 
       renderReadingSummary();
       setLoadingState();
@@ -88,24 +93,45 @@
               // The user prompt says "Start the generated report content... send to TAROT_API_ENDPOINT again".
               // So we do this sequentially.
 
+              appState.isGeneratingFinalReport = true;
+              // Re-render immediately to reflect the "Generating..." status if the user is watching
+              ReadingPage.renderCardInterpretations(appState.remoteInterpretations, { autoExpand: true });
+
               const finalResult = await fetchTarotInterpretations(reportText, true);
-              if (finalResult && finalResult.output) {
-                appState.finalReport = finalResult.output;
-                // Re-render to show the final report? 
-                // The requirements say "final tarot result, add this final report in". 
-                // So we probably need to update the UI to show this new info.
-                // For now, let's re-render card interpretations or add a specific final report section.
-                // If the UI doesn't support it yet, we might need to modify renderCardInterpretations.
-                // But for now, let's assume we just store it and maybe the user goes to ReportPage.
-                // Wait, the prompt says "Ultimately add this final report in".
-                // Let's re-render to ensure any UI components affecting this are updated.
+              const finalPayload = Array.isArray(finalResult) ? finalResult[0] : finalResult;
+              if (finalPayload && finalPayload.output) {
+                appState.finalReport = finalPayload.output;
+
+                // Re-render to show the final report if the user is currently on the report page
+                // or just to ensure the DOM is updated if the report was already rendered.
+                if (window.ReportPage && typeof window.ReportPage.render === 'function') {
+                  window.ReportPage.render();
+                }
+
                 ReadingPage.renderCardInterpretations(appState.remoteInterpretations, { autoExpand: true });
+                ReadingPage.renderCardInterpretations(appState.remoteInterpretations, { autoExpand: true });
+              } else {
+                console.warn('Final report API returned unexpected format:', finalResult);
+                // If the API returns something else (e.g. an array of interpretations because it ignored is_final),
+                // we should treat it as an error or at least fail gracefully.
+                appState.finalReportError = translate('errorFinalReportFormat', { fallback: '總結報告格式錯誤' });
               }
+            } else {
+              console.error('Failed to generate report text for final report API.');
+              appState.finalReportError = translate('errorReportTextGeneration', { fallback: '無法生成報告文本' });
             }
 
           } catch (secondPassError) {
             console.error('Failed to fetch final report:', secondPassError);
+            appState.finalReportError = secondPassError.message || 'Unknown error';
             // We don't fail the whole reading if the second pass fails, just log it.
+          } finally {
+            appState.isGeneratingFinalReport = false;
+            // One last render to clear the loading state
+            ReadingPage.renderCardInterpretations(appState.remoteInterpretations, { autoExpand: true });
+            if (window.ReportPage && typeof window.ReportPage.render === 'function') {
+              window.ReportPage.render();
+            }
           }
 
         } else {
@@ -228,6 +254,13 @@
             ? `<div class="card-interpretation__image-wrapper">${imageInnerHtml}</div>`
             : '';
 
+          // Check if this is the last card and we are generating final report
+          let loadingIndicator = '';
+          if (index === appState.selectedSpread.positions.length - 1 && appState.isGeneratingFinalReport) {
+            const processingText = translate('processingFinalReport', { fallback: '正在生成總結報告...' });
+            loadingIndicator = `<div class="card-interpretation__notice details-notice">${processingText}</div>`;
+          }
+
           return `
             <article class="card-interpretation" id="${interpretationId}">
               <div class="card-interpretation__header">
@@ -240,6 +273,7 @@
               <div class="keywords">${keywords}</div>
               <button class="btn ghost" data-toggle="details">${buttonLabel}</button>
             </article>
+            ${loadingIndicator}
           `;
         })
         .join('');

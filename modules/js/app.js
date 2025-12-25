@@ -15,7 +15,9 @@ const state = {
   interpretationNoticeKey: '',
   interpretationNoticeReplacements: null,
   language: 'english',
-  finalReport: null
+  finalReport: null,
+  isGeneratingFinalReport: false,
+  finalReportError: null
 };
 
 const ui = {};
@@ -31,6 +33,12 @@ function translate(key, replacements = {}) {
     (UI_TEXT[language] && UI_TEXT[language][key]) ||
     (UI_TEXT[LANGUAGE_OPTIONS.CHINESE] && UI_TEXT[LANGUAGE_OPTIONS.CHINESE][key]) ||
     '';
+  if (!template) {
+    if (replacements && typeof replacements.fallback === 'string') {
+      return replacements.fallback;
+    }
+    return '';
+  }
   return template.replace(/\{(\w+)\}/g, (match, token) => {
     if (Object.prototype.hasOwnProperty.call(replacements, token)) {
       return replacements[token];
@@ -776,6 +784,8 @@ function resetAll() {
   state.interpretationNoticeKey = '';
   state.interpretationNoticeReplacements = null;
   state.finalReport = null;
+  state.isGeneratingFinalReport = false;
+  state.finalReportError = null;
   if (window.QuestionPage && typeof window.QuestionPage.reset === 'function') {
     window.QuestionPage.reset();
   } else {

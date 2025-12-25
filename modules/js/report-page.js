@@ -132,6 +132,22 @@
             <p>${finalText}</p>
           </div>
         `;
+      } else if (appState.isGeneratingFinalReport) {
+        const loadingText = translate('loadingFinalReport', { fallback: '正在生成總結報告...' });
+        finalReportHtml = `
+          <div class="report-summary__item report-summary__item--final">
+             <div class="card-interpretation__loading">${loadingText}</div>
+          </div>
+        `;
+      } else if (appState.finalReportError) {
+        const errorTitle = translate('errorFinalReportTitle', { fallback: '生成總結報告失敗' });
+        const errorMessage = translate('errorFinalReportMessage', { fallback: '無法生成總結報告，請稍後再試。' });
+        finalReportHtml = `
+          <div class="report-summary__item report-summary__item--final error">
+             <strong>${errorTitle}</strong>
+             <p>${errorMessage}</p>
+          </div>
+        `;
       }
 
       ui.reportSummary.innerHTML = `${headerHtml}<div class="report-summary__list">${listHtml}${finalReportHtml}</div>`;
