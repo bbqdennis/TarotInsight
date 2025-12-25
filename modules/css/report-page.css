@@ -26,6 +26,10 @@
   gap: 8px;
 }
 
+.report-summary__final-text {
+  white-space: pre-line;
+}
+
 .report-summary__meta {
   color: var(--color-muted);
   font-size: 0.85rem;

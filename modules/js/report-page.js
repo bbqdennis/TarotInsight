@@ -129,7 +129,7 @@
         finalReportHtml = `
           <div class="report-summary__item report-summary__item--final">
             <strong>${finalTitle}</strong>
-            <p>${finalText}</p>
+            <p class="report-summary__final-text">${finalText}</p>
           </div>
         `;
       } else if (appState.isGeneratingFinalReport) {
