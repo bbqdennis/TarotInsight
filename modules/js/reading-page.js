@@ -50,9 +50,11 @@
       appState.interpretationAutoExpand = false;
       appState.interpretationNoticeKey = '';
       appState.interpretationNoticeReplacements = null;
+      appState.remoteInterpretations = null;
+      appState.finalReport = null; // Clear previous final report
+
       renderReadingSummary();
       setLoadingState();
-      appState.remoteInterpretations = null;
 
       const questionPayload = buildQuestionPayload();
       if (!questionPayload) {
@@ -61,10 +63,51 @@
       }
 
       try {
+        // First Pass: Get individual card interpretations
         const remoteResults = await fetchTarotInterpretations(questionPayload);
+
         if (Array.isArray(remoteResults) && remoteResults.length) {
           appState.remoteInterpretations = remoteResults;
+          // Render the first pass results immediately
           ReadingPage.renderCardInterpretations(remoteResults, { autoExpand: true });
+
+          // Second Pass: Generate final report
+          try {
+            // We need to generate the text based on the first pass results
+            // Since we can't easily access ReportPage.buildCopyText directly without ensuring it's loaded 
+            // and uses the current state (which we just updated with remoteInterpretations), 
+            // we will use a helper if available or construct it manually. 
+            // However, appState.remoteInterpretations is set, so ReportPage should work if available.
+            let reportText = '';
+            if (window.ReportPage && typeof window.ReportPage.buildCopyText === 'function') {
+              reportText = window.ReportPage.buildCopyText();
+            }
+
+            if (reportText) {
+              // Update loading state for final report if necessary or just let it load in background?
+              // The user prompt says "Start the generated report content... send to TAROT_API_ENDPOINT again".
+              // So we do this sequentially.
+
+              const finalResult = await fetchTarotInterpretations(reportText, true);
+              if (finalResult && finalResult.output) {
+                appState.finalReport = finalResult.output;
+                // Re-render to show the final report? 
+                // The requirements say "final tarot result, add this final report in". 
+                // So we probably need to update the UI to show this new info.
+                // For now, let's re-render card interpretations or add a specific final report section.
+                // If the UI doesn't support it yet, we might need to modify renderCardInterpretations.
+                // But for now, let's assume we just store it and maybe the user goes to ReportPage.
+                // Wait, the prompt says "Ultimately add this final report in".
+                // Let's re-render to ensure any UI components affecting this are updated.
+                ReadingPage.renderCardInterpretations(appState.remoteInterpretations, { autoExpand: true });
+              }
+            }
+
+          } catch (secondPassError) {
+            console.error('Failed to fetch final report:', secondPassError);
+            // We don't fail the whole reading if the second pass fails, just log it.
+          }
+
         } else {
           appState.remoteInterpretations = null;
           ReadingPage.renderCardInterpretations(null, {
@@ -74,6 +117,7 @@
       } catch (error) {
         console.error('Failed to fetch tarot insights:', error);
         appState.remoteInterpretations = null;
+        appState.finalReport = null;
         ReadingPage.renderCardInterpretations(null, {
           messageKey: 'remoteUnavailable'
         });
@@ -227,7 +271,9 @@
       appState.interpretationAutoExpand = false;
       appState.interpretationNoticeKey = '';
       appState.interpretationNoticeReplacements = null;
+      appState.interpretationNoticeReplacements = null;
       appState.remoteInterpretations = null;
+      appState.finalReport = null;
       if (ui?.readingOverview) {
         ui.readingOverview.innerHTML = '';
       }
@@ -346,7 +392,7 @@
     return lines.join('\n');
   }
 
-  async function fetchTarotInterpretations(questionPayload) {
+  async function fetchTarotInterpretations(questionPayload, isFinal = false) {
     if (!apiConfig.endpoint) {
       return null;
     }
@@ -354,6 +400,15 @@
     const timeoutLimit = typeof apiConfig.timeout === 'number' ? apiConfig.timeout : 60000;
     const timeoutId = setTimeout(() => controller.abort(), timeoutLimit);
     const language = appState?.language === 'english' ? 'english' : 'chinese';
+
+    const payload = {
+      question: questionPayload,
+      language: language
+    };
+
+    if (isFinal) {
+      payload.is_final = true;
+    }
 
     try {
       const response = await fetch(apiConfig.endpoint, {
@@ -363,10 +418,7 @@
           Accept: 'application/json',
           'n8n-key': 'connect-to-n8n'
         },
-        body: JSON.stringify({
-          question: questionPayload,
-          language: language
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal
       });
 

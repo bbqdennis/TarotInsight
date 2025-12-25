@@ -76,9 +76,9 @@
       const escapedQuestion = appState.question ? escapeHtml(appState.question) : '';
       const questionHtml = appState.question
         ? `<p>${translate('reportQuestionLabel', {
-            question: escapedQuestion,
-            fallback: `提問：「${escapedQuestion}」`
-          })}</p>`
+          question: escapedQuestion,
+          fallback: `提問：「${escapedQuestion}」`
+        })}</p>`
         : '';
       const timestampText = getTimestamp?.() || '';
       const categoriesText = getCategories?.() || '';
@@ -122,7 +122,19 @@
         })
         .join('');
 
-      ui.reportSummary.innerHTML = `${headerHtml}<div class="report-summary__list">${listHtml}</div>`;
+      let finalReportHtml = '';
+      if (appState.finalReport) {
+        const finalText = escapeHtml(appState.finalReport);
+        const finalTitle = translate('reportFinalTitle', { fallback: '總結報告' });
+        finalReportHtml = `
+          <div class="report-summary__item report-summary__item--final">
+            <strong>${finalTitle}</strong>
+            <p>${finalText}</p>
+          </div>
+        `;
+      }
+
+      ui.reportSummary.innerHTML = `${headerHtml}<div class="report-summary__list">${listHtml}${finalReportHtml}</div>`;
     },
 
     buildCopyText() {
@@ -287,7 +299,15 @@
         );
       }
       lines.push('');
+      lines.push('');
     });
+
+    if (appState.finalReport) {
+      const finalTitle = translate('reportFinalTitle', { fallback: '總結報告' });
+      lines.push(`${finalTitle}`);
+      lines.push(appState.finalReport);
+      lines.push('');
+    }
 
     return lines.join('\n').trim();
   }

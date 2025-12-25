@@ -14,7 +14,8 @@ const state = {
   interpretationAutoExpand: false,
   interpretationNoticeKey: '',
   interpretationNoticeReplacements: null,
-  language: 'english'
+  language: 'english',
+  finalReport: null
 };
 
 const ui = {};
@@ -774,6 +775,7 @@ function resetAll() {
   state.interpretationAutoExpand = false;
   state.interpretationNoticeKey = '';
   state.interpretationNoticeReplacements = null;
+  state.finalReport = null;
   if (window.QuestionPage && typeof window.QuestionPage.reset === 'function') {
     window.QuestionPage.reset();
   } else {
