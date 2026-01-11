@@ -79,7 +79,7 @@ window.i18n = {
   getText: (value, defaultValue = '') => getLocalizedText(value, defaultValue)
 };
 
-const TAROT_API_ENDPOINT = 'https://n8nautorobot.duckdns.org/webhook/tarot_master';
+const TAROT_API_ENDPOINT = 'https://n8n.ukdailyevents.co.uk/webhook/tarot_master';
 const TAROT_API_TIMEOUT = 60000;
 
 function escapeHtml(value) {
