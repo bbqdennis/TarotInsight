@@ -20,10 +20,10 @@
 }
 
 .spread-position {
-  background: rgba(106, 79, 200, 0.06);
+  background: rgba(199, 162, 106, 0.08);
   border-radius: var(--radius-md);
   padding: 16px;
-  border: 1px dashed rgba(106, 79, 200, 0.2);
+  border: 1px dashed rgba(199, 162, 106, 0.25);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -66,7 +66,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(18, 15, 26, 0.9);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
@@ -93,6 +93,7 @@
   transform: scale(1);
   transition: transform 0.25s ease;
   cursor: zoom-in;
+  border: 1px solid rgba(199, 162, 106, 0.2);
 }
 
 .card-image.is-reversed {
@@ -141,7 +142,7 @@
 }
 
 .card-status__label {
-  color: var(--color-primary);
+  color: #f1d9aa;
   font-weight: 600;
 }
 
