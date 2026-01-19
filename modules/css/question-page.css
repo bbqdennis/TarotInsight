@@ -24,7 +24,7 @@
   --spread-card-color-soft: rgba(199, 162, 106, 0.14);
   --spread-card-shadow: rgba(10, 9, 20, 0.45);
   --spread-card-border: rgba(199, 162, 106, 0.25);
-  background: linear-gradient(135deg, rgba(27, 23, 39, 0.9), rgba(15, 13, 23, 0.95) 70%);
+  background: linear-gradient(135deg, var(--spread-card-color-soft), rgba(18, 15, 26, 0.92) 70%);
   border-radius: var(--radius-md);
   border: 1px solid var(--spread-card-border);
   padding: 20px;
