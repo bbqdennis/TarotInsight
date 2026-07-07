@@ -245,7 +245,7 @@
 
       const card = drawCard();
       appState.spreadDraws[nextIndex] = card;
-      SpreadPage.updatePositionStatus();
+      SpreadPage.updatePositionStatus([nextIndex]);
       checkDrawCompletion();
     },
 
@@ -253,17 +253,21 @@
       if (!appState || !Array.isArray(appState.spreadDraws)) {
         return;
       }
+      const drawnIndices = [];
       let nextIndex = appState.spreadDraws.findIndex((entry) => entry === null);
       while (nextIndex !== -1) {
         appState.spreadDraws[nextIndex] = drawCard();
+        drawnIndices.push(nextIndex);
         nextIndex = appState.spreadDraws.findIndex((entry) => entry === null);
       }
-      SpreadPage.updatePositionStatus();
+      SpreadPage.updatePositionStatus(drawnIndices);
       checkDrawCompletion();
     },
 
     resetDeck,
-    updatePositionStatus() {
+    // animateIndices: positions freshly drawn this action; they replay the
+    // deal/flip animation with a staggered delay while older cards stay still.
+    updatePositionStatus(animateIndices = []) {
       if (!appState || !appState.selectedSpread) {
         return;
       }
@@ -271,7 +275,11 @@
         const card = appState.spreadDraws[index];
         const statusElement = document.getElementById(`position-card-${index}`);
         if (statusElement) {
-          statusElement.innerHTML = buildCardStatusHtml(card);
+          const animateOrder = animateIndices.indexOf(index);
+          statusElement.innerHTML = buildCardStatusHtml(card, {
+            animate: animateOrder !== -1,
+            dealDelay: animateOrder > 0 ? animateOrder * 0.18 : 0
+          });
         }
       });
     },
@@ -491,9 +499,21 @@
     }
 
     const alignClass = options.align === 'right' ? ' card-status--right' : '';
+    const flipClasses = ['card-flip'];
+    if (options.animate) {
+      flipClasses.push('is-dealing');
+    }
+    const delayStyle = options.animate && options.dealDelay
+      ? ` style="--deal-delay: ${options.dealDelay}s"`
+      : '';
     return `
       <div class="card-status${alignClass}">
-        ${imageHtml}
+        <div class="${flipClasses.join(' ')}"${delayStyle}>
+          <div class="card-flip__inner">
+            <div class="card-flip__back" aria-hidden="true"></div>
+            <div class="card-flip__front">${imageHtml}</div>
+          </div>
+        </div>
         <span class="card-status__label">${cardLabel}</span>
       </div>
     `.trim();

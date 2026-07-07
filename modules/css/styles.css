@@ -52,6 +52,17 @@ body::before {
   background-size: 120px 120px;
   opacity: 0.25;
   mix-blend-mode: screen;
+  animation: starTwinkle 6s ease-in-out infinite;
+}
+
+@keyframes starTwinkle {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 body::after {
@@ -110,6 +121,30 @@ h3 {
 .app-header h1 {
   margin: 0 0 12px;
   font-size: 2.6rem;
+  background: linear-gradient(110deg, #c7a26a 20%, #f6e6c5 40%, #e3c58b 50%, #f6e6c5 60%, #c7a26a 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 5s linear infinite;
+}
+
+@keyframes goldShimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.app-header__content::after {
+  content: "✦ ✦ ✦";
+  display: block;
+  margin-top: 20px;
+  letter-spacing: 1.4em;
+  padding-left: 1.4em;
+  font-size: 0.8rem;
+  color: rgba(227, 197, 139, 0.85);
+  text-shadow: 0 0 14px rgba(199, 162, 106, 0.9);
+  animation: starTwinkle 4s ease-in-out infinite;
 }
 
 .app-header p {
@@ -129,13 +164,25 @@ h3 {
 .panel {
   background: linear-gradient(180deg, rgba(27, 23, 39, 0.96), rgba(15, 13, 23, 0.94));
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(199, 162, 106, 0.18);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(227, 197, 139, 0.25), 0 0 45px rgba(199, 162, 106, 0.08);
+  border: 1px solid rgba(199, 162, 106, 0.28);
   padding: 40px 32px 32px;
   margin-bottom: 32px;
   display: none;
+  position: relative;
   transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition);
   backdrop-filter: blur(10px);
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(227, 197, 139, 0.75), transparent);
+  pointer-events: none;
 }
 
 .panel.active {
@@ -231,7 +278,31 @@ h3 {
   font-weight: 600;
   font-family: "Cinzel", "Noto Serif TC", serif;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
   transition: transform var(--transition), box-shadow var(--transition), background var(--transition), border-color var(--transition);
+}
+
+/* Light-sweep highlight that glides across buttons on hover. */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -80%;
+  width: 50%;
+  background: linear-gradient(105deg, transparent, rgba(255, 250, 235, 0.45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  transition: left 0.5s ease;
+}
+
+.btn:hover:not(:disabled)::before {
+  left: 130%;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
 }
 
 .btn:disabled {
@@ -271,87 +342,6 @@ h3 {
 
 .btn:hover:not(:disabled) {
   box-shadow: 0 12px 22px rgba(10, 9, 20, 0.35);
-}
-
-.card-lightbox {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.card-lightbox.active {
-  display: flex;
-}
-
-.card-lightbox__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(6, 5, 12, 0.82);
-}
-
-.card-lightbox__content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  padding: 24px;
-}
-
-.card-lightbox__image {
-  width: auto !important;
-  height: auto !important;
-  max-width: min(80vw, 540px);
-  max-height: 80vh;
-  cursor: zoom-out;
-  transform: none !important;
-}
-
-.card-lightbox__image:hover {
-  transform: none !important;
-}
-
-.card-lightbox__image.is-reversed {
-  transform: rotate(180deg) !important;
-}
-
-.card-lightbox__image.is-reversed:hover {
-  transform: rotate(180deg) !important;
-}
-
-.card-lightbox__close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  border: none;
-  background: rgba(246, 239, 227, 0.9);
-  color: var(--color-ink);
-  font-size: 1.2rem;
-  border-radius: 999px;
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--transition), transform var(--transition);
-  z-index: 2;
-}
-
-.card-lightbox__close:hover {
-  background: #fff;
-  transform: scale(1.05);
-}
-
-.card-lightbox__caption {
-  color: #fff;
-  font-size: 0.95rem;
-  text-align: center;
-  display: none;
 }
 
 .app-footer {
