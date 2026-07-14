@@ -200,8 +200,8 @@
     }
 
     if (ui.downloadReport) {
-      ui.downloadReport.addEventListener('click', () => {
-        window.print();
+      ui.downloadReport.addEventListener('click', async () => {
+        await downloadReportPdf();
       });
     }
 
@@ -234,6 +234,45 @@
         }, 2000);
       });
     }
+  }
+
+  async function downloadReportPdf() {
+    const PdfDocument = window.jspdf?.jsPDF;
+    if (!ui?.reportSummary || typeof window.html2canvas !== 'function' || !PdfDocument) {
+      console.error('PDF download dependencies are unavailable.');
+      return;
+    }
+
+    const canvas = await window.html2canvas(ui.reportSummary, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true
+    });
+    const pdf = new PdfDocument({ format: 'a4', unit: 'mm' });
+    const margin = 10;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const contentWidth = pageWidth - margin * 2;
+    const contentHeight = (canvas.height * contentWidth) / canvas.width;
+    const printableHeight = pageHeight - margin * 2;
+
+    for (let offset = 0; offset < contentHeight; offset += printableHeight) {
+      if (offset > 0) {
+        pdf.addPage();
+      }
+      pdf.addImage(
+        canvas,
+        'PNG',
+        margin,
+        margin - offset,
+        contentWidth,
+        contentHeight,
+        undefined,
+        'FAST'
+      );
+    }
+
+    pdf.save(`tarot-insight-report-${new Date().toISOString().slice(0, 10)}.pdf`);
   }
 
   function buildShareOrCopyText({ includeAdvice }) {
